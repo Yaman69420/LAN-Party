@@ -3,27 +3,25 @@ declare(strict_types=1);
 
 /**
  * Centraal Route Bestand
- * Hier worden alle routes gedefinieerd voor zowel public als admin entry points.
- * 
- * @var \App\Core\Router $router
  */
 
 // --- Public Routes ---
 $router->get('/', 'HomeController', 'index');
+$router->get('/resources', 'RentalController', 'index');
 
 // Auth
-$router->get('/login', 'Auth\AuthController', 'showLogin');
-$router->post('/login', 'Auth\AuthController', 'login');
-$router->get('/register', 'Auth\AuthController', 'showRegister');
-$router->post('/register', 'Auth\AuthController', 'register');
-$router->get('/logout', 'Auth\AuthController', 'logout');
+$router->get('/login', 'AuthController', 'showLogin');
+$router->post('/login', 'AuthController', 'login');
+$router->get('/register', 'AuthController', 'showRegister');
+$router->post('/register', 'AuthController', 'register');
+$router->get('/logout', 'AuthController', 'logout');
 
 
 // --- User Routes (Login verplicht) ---
-$router->get('/dashboard', 'User\DashboardController', 'index');
+$router->get('/dashboard', 'HomeController', 'dashboard');
+$router->get('/propose', 'HomeController', 'propose');
 
 // --- Admin Routes ---
-// Deze werken nu via /admin (via admin/index.php) én /public/admin (via public/index.php)
-$router->get('/admin', 'Admin\DashboardController', 'index');
-$router->get('/admin/users', 'Admin\UserController', 'index');
-$router->get('/admin/parties', 'Admin\PartyController', 'index');
+$router->get('/admin', 'AdminController', 'index');
+$router->get('/admin/users', 'AdminController', 'users');
+$router->get('/admin/approvals', 'AdminController', 'approvals');

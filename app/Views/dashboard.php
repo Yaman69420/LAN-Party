@@ -6,6 +6,6 @@
 <body>
     <h1>Welkom op je Dashboard!</h1>
     <p>Hier zie je binnenkort je inschrijvingen.</p>
-    <a href="/logout">Uitloggen</a>
+    <a href="../../public/index.php">Uitloggen</a>
 </body>
 </html>

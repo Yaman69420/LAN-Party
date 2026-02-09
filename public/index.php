@@ -9,8 +9,8 @@ declare(strict_types=1);
 // Start sessie voor CSRF en flash messages
 session_start();
 
-// Laad autoloader
-require_once __DIR__ . '/autoload.php';
+// Laad autoloader (vanuit root)
+require_once __DIR__ . '/../autoload.php';
 
 // Laad helpers
 require_once __DIR__ . '/../app/Core/helpers.php';
