@@ -12,10 +12,9 @@ Een PHP MVC project voor LAN-Party evenementen.
 
 1. Clone de repository
 2. Maak database `lan_party_db` aan in phpMyAdmin
-3. Kopieer `admin/config/database.example.php` naar `admin/config/database.php`
-4. Vul je database gegevens in
-5. Voer de migrations uit (zie `migrations/README.md`)
-6. Configureer je virtual host naar de `public` map
+3. Importeer `database/lan_party_db.sql` (indien aanwezig)
+4. Kopieer `admin/config/database.example.php` naar `admin/config/database.php`
+5. Configureer je virtual host naar de `public` map
 
 ## Projectstructuur
 
@@ -28,15 +27,15 @@ LAN-Party/
 ├── public/                   # Publieke website (DocumentRoot)
 │   ├── assets/               # CSS, JS, afbeeldingen
 │   └── views/                # Publieke views
-├── migrations/               # Database schema wijzigingen
+├── database/                 # Database exports
 └── .htaccess                 # URL rewriting
 ```
 
 ## Database Workflow (Team)
 
-1. Maak schema wijziging → nieuw bestand in `migrations/`
+1. Export database in phpMyAdmin → zet in `database/lan_party_db.sql`
 2. Commit en push naar `dev` branch
-3. Teamgenoten pullen en voeren nieuwe SQL uit in phpMyAdmin
+3. Teamgenoten pullen en importeren in hun phpMyAdmin
 
 ## Ontwikkeling
 
