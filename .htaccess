@@ -1,6 +1,7 @@
 RewriteEngine On
 
-# Redirect alles naar public/index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [QSA,L]
+# Redirect de hoofdpagina naar de public map
+RewriteRule ^$ public/ [L]
+
+# Redirect alle andere paden naar de public map
+RewriteRule ^((?!public/).*)$ public/$1 [L]

@@ -56,7 +56,20 @@ function redirect(string $url): void
 function view(string $name, array $data = []): void
 {
     extract($data);
+
+    // We vangen de output van de specifieke pagina op
+    ob_start();
     require __DIR__ . '/../Views/' . $name . '.php';
+    $content = ob_get_clean();
+
+    // We checken of de 'main' layout bestaat.
+    // Als die er is, laden we die in met jouw sidebar.
+    if (file_exists(__DIR__ . '/../Views/layouts/main.php')) {
+        require __DIR__ . '/../Views/layouts/main.php';
+    } else {
+        // Fallback: als je layout nog niet af is, toon je alleen de content
+        echo $content;
+    }
 }
 
 /**
