@@ -10,8 +10,7 @@ namespace App\Controllers\Admin;
 class UserController
 {
     public function __construct() {
-        // TODO: Check hier of gebruiker admin is!
-        // if (!isAdmin()) { redirect('/login'); }
+        requireAdmin();
     }
 
     public function index(): void

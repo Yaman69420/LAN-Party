@@ -58,3 +58,49 @@ function view(string $name, array $data = []): void
     extract($data);
     require __DIR__ . '/../Views/' . $name . '.php';
 }
+
+/**
+ * Check of gebruiker is ingelogd
+ */
+function isLoggedIn(): bool
+{
+    return isset($_SESSION['user']);
+}
+
+/**
+ * Check of gebruiker admin is
+ */
+function isAdmin(): bool
+{
+    return isLoggedIn() && ($_SESSION['user']['role'] === 'admin');
+}
+
+/**
+ * Haal ingelogde user op
+ */
+function user(): ?array
+{
+    return $_SESSION['user'] ?? null;
+}
+
+/**
+ * Require Login - Redirect als niet ingelogd
+ */
+function requireLogin(): void
+{
+    if (!isLoggedIn()) {
+        redirect('/login');
+    }
+}
+
+/**
+ * Require Admin - Redirect (of 403) als niet admin
+ */
+function requireAdmin(): void
+{
+    requireLogin();
+    if (!isAdmin()) {
+        http_response_code(403);
+        die('403 - Geen toegang');
+    }
+}

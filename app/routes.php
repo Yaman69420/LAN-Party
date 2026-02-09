@@ -14,7 +14,10 @@ $router->get('/', 'HomeController', 'index');
 // Auth
 $router->get('/login', 'Auth\AuthController', 'showLogin');
 $router->post('/login', 'Auth\AuthController', 'login');
+$router->get('/register', 'Auth\AuthController', 'showRegister');
+$router->post('/register', 'Auth\AuthController', 'register');
 $router->get('/logout', 'Auth\AuthController', 'logout');
+
 
 // --- User Routes (Login verplicht) ---
 $router->get('/dashboard', 'User\DashboardController', 'index');
