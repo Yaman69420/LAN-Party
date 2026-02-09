@@ -20,10 +20,6 @@ use App\Core\Router;
 // Maak router aan
 $router = new Router();
 
-// ===========================================
-// ROUTES
-// ===========================================
-
 // Laad routes vanuit centraal bestand
 require __DIR__ . '/../app/routes.php';
 

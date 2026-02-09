@@ -7,7 +7,7 @@ Thumbs.db
 .vscode/
 
 # Config met wachtwoorden
-config/database.php
+app/Config/database.php
 
 # Logs
 *.log
