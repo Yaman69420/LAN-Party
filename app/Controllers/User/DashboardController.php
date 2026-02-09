@@ -11,11 +11,10 @@ class DashboardController
 {
     public function index(): void
     {
-        // TODO: Check hier of user is ingelogd
-        // if (!isLoggedIn()) { redirect('/login'); }
+        requireLogin();
         
         view('user/dashboard', [
-            'username' => $_SESSION['user']['username'] ?? 'Gebruiker'
+            'username' => user()['username']
         ]);
     }
 }

@@ -11,8 +11,7 @@ class DashboardController
 {
     public function index(): void
     {
-        // TODO: Check hier of user admin is
-        // if (!isAdmin()) { redirect('/login'); }
+        requireAdmin();
         
         view('admin/dashboard');
     }

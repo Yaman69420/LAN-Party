@@ -15,13 +15,9 @@ class Database
     {
         $config = require __DIR__ . '/../../config/database.php';
 
-        $dsn = sprintf(
-            'mysql:host=%s;port=%d;dbname=%s;charset=%s',
-            $config['host'],
-            $config['port'],
-            $config['dbname'],
-            $config['charset']
-        );
+        $port = $config['port'] ?? 3306;
+
+        $dsn = "mysql:host={$config['host']};port={$port};dbname={$config['dbname']};charset={$config['charset']}";
 
         $this->pdo = new \PDO($dsn, $config['user'], $config['pass'], [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
