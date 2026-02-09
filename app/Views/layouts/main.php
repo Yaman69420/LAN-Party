@@ -73,13 +73,22 @@
                     </span>
 
                 <div class="flex items-center space-x-3 border-l border-white/10 pl-6">
-                    <div class="text-right">
-                        <p class="text-xs text-white font-bold leading-none">Magaly B.</p>
-                        <p class="text-[10px] text-cyber-cyan opacity-70 uppercase tracking-tighter">Admin</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full border border-cyber-cyan p-0.5 shadow-inner">
-                        <img src="https://ui-avatars.com/api/?name=Magaly+B&background=0b0c10&color=00f2ff" class="rounded-full" alt="Avatar">
-                    </div>
+                    <?php if (function_exists('isLoggedIn') && isLoggedIn()): ?>
+                        <?php $authUser = user(); ?>
+                        <div class="text-right">
+                            <p class="text-xs text-white font-bold leading-none"><?= e($authUser['username'] ?? 'User') ?></p>
+                            <p class="text-[10px] text-cyber-cyan opacity-70 uppercase tracking-tighter"><?= e($authUser['role'] ?? 'MEMBER') ?></p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full border border-cyber-cyan p-0.5 shadow-inner">
+                            <img src="https://ui-avatars.com/api/?name=<?= urlencode($authUser['username'] ?? 'User') ?>&background=0b0c10&color=00f2ff" class="rounded-full" alt="Avatar">
+                        </div>
+                        <!-- Logout knopje klein erbij -->
+                        <a href="/logout" class="ml-2 text-red-500 text-xs hover:text-red-400" title="Uitloggen">⏻</a>
+                    <?php else: ?>
+                        <div class="text-right">
+                            <a href="/login" class="text-xs text-cyber-cyan font-bold leading-none hover:underline">INLOGGEN</a>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </header>

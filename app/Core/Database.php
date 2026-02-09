@@ -13,7 +13,7 @@ class Database
 
     private function __construct()
     {
-        $config = require __DIR__ . '/../Config/database.php';
+        $config = require __DIR__ . '/../../config/database.php';
 
         $port = $config['port'] ?? 3306;
 

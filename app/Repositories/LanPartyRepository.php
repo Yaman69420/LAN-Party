@@ -22,12 +22,11 @@ class LanPartyRepository {
                     lp.id, 
                     lp.name, 
                     lp.start_date, 
-                    lp.location,
                     i.name AS item_name, 
-                    r.quantity 
+                    t.quantity 
                 FROM lan_parties AS lp
-                LEFT JOIN reservations AS r ON lp.id = r.lan_party_id
-                LEFT JOIN items AS i ON r.item_id = i.id
+                LEFT JOIN rentals AS t ON lp.id = t.lan_party_id
+                LEFT JOIN items AS i ON t.item_id = i.id
                 ORDER BY lp.start_date ASC";
 
         $stmt = $this->db->query($sql);
@@ -42,7 +41,6 @@ class LanPartyRepository {
                 $parties[$date] = [
                     'id'       => $row['id'],
                     'title'    => $row['name'],
-                    'location' => $row['location'],
                     'items'    => []
                 ];
             }

@@ -20,9 +20,7 @@ class UserDashboardController
             session_start();
         }
 
-        // STAP B: Debugging (TIJDELIJK)
-        // Als dit op je scherm verschijnt, weten we dat de controller bereikt wordt
-        // die $_SESSION['user'] = null; // Haal dit weg als het werkt
+        requireLogin();
 
         $parties = $this->lanPartyRepo->getAllPartiesWithReservations();
 

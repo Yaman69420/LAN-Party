@@ -6,13 +6,18 @@ namespace App\Models;
 class User
 {
     public int $id;
+    public string $first_name;
+    public string $last_name;
     public string $username;
     public string $email;
-    public string $password = '';
-    public string $role = 'user';
-    public ?string $first_name = null;
-    public ?string $last_name = null;
-    public ?string $password_hash = null;
-    public ?int $is_active = null;
-    public ?string $created_at = null;
+    public string $password_hash; // Changed from 'password' to match DB column
+    public string $role;
+    public int $is_active; // Changed to int to match TINYINT(1) DB return
+    public string $created_at;
+
+    // Helper to get full name
+    public function getFullName(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
 }

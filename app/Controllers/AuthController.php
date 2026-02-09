@@ -20,7 +20,7 @@ class AuthController
         $password = $_POST['password'] ?? '';
         $user = $this->userRepo->findByEmail($email);
 
-        if ($user && password_verify($password, $user->password)) {
+        if ($user && password_verify($password, $user->password_hash)) {
             $_SESSION['user'] = [
                 'id' => $user->id,
                 'username' => $user->username,
@@ -36,6 +36,44 @@ class AuthController
     public function showLogin(): void {
         if (isset($_SESSION['user'])) { header("Location: /dashboard"); exit; }
         view('auth/login');
+    }
+
+    public function showRegister(): void {
+        if (isset($_SESSION['user'])) { header("Location: /dashboard"); exit; }
+        view('auth/register');
+    }
+
+    public function register(): void {
+        if (!csrf_verify()) die('Invalid CSRF token');
+
+        $username = $_POST['username'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $firstName = $_POST['first_name'] ?? '';
+        $lastName = $_POST['last_name'] ?? '';
+
+        // Basic validation
+        if (empty($username) || empty($email) || empty($password)) {
+             view('auth/register', ['error' => 'Vul alle verplichte velden in.']);
+             return;
+        }
+
+        // Check if user already exists
+        if ($this->userRepo->findByEmail($email)) {
+            view('auth/register', ['error' => 'Dit e-mailadres is al in gebruik.']);
+            return;
+        }
+
+        // Hash password
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Create user
+        if ($this->userRepo->create($username, $email, $passwordHash, $firstName, $lastName)) {
+            // Auto login or redirect to login
+            view('auth/login', ['success' => 'Account aangemaakt! Je kunt nu inloggen.']);
+        } else {
+            view('auth/register', ['error' => 'Er ging iets mis bij het registreren.']);
+        }
     }
 
     public function logout(): void {
