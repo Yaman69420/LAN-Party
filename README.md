@@ -1,43 +1,39 @@
 # LAN-Party
 
-Een PHP MVC project voor LAN-Party evenementen.
+PHP OOP MVC project voor LAN-Party evenementen - SYNTRA Groepswerk
 
 ## Vereisten
 
 - PHP 8.0+
 - MySQL (via MAMP/XAMPP)
-- phpMyAdmin voor database beheer
+- phpMyAdmin
 
 ## Installatie
 
 1. Clone de repository
 2. Maak database `lan_party_db` aan in phpMyAdmin
-3. Importeer `database/lan_party_db.sql` (indien aanwezig)
-4. Kopieer `admin/config/database.example.php` naar `admin/config/database.php`
-5. Configureer je virtual host naar de `public` map
+3. Kopieer `config/database.example.php` naar `config/database.php`
+4. Configureer virtual host naar de `public` map
 
 ## Projectstructuur
 
 ```
 LAN-Party/
-├── admin/                    # Backend (admin panel)
-│   ├── classes/Admin/        # PHP classes
-│   ├── config/               # Configuratie bestanden
-│   └── views/                # Admin views
-├── public/                   # Publieke website (DocumentRoot)
-│   ├── assets/               # CSS, JS, afbeeldingen
-│   └── views/                # Publieke views
-├── database/                 # Database exports
-└── .htaccess                 # URL rewriting
+├── app/
+│   ├── Controllers/      # Controllers
+│   ├── Models/           # Models
+│   ├── Repositories/     # Database queries
+│   ├── Views/            # Templates
+│   └── Core/             # Router, Database, helpers
+├── config/               # Configuratie
+├── public/               # Front controller (DocumentRoot)
+├── TEAM_PLAN.md          # Teamafspraken
+├── ARCHITECTURE.md       # MVC uitleg
+├── TEST_LOG.md           # Testcases
+└── CHANGELOG.md          # Per groepslid
 ```
 
-## Database Workflow (Team)
+## Team
 
-1. Export database in phpMyAdmin → zet in `database/lan_party_db.sql`
-2. Commit en push naar `dev` branch
-3. Teamgenoten pullen en importeren in hun phpMyAdmin
-
-## Ontwikkeling
-
-- Website: `http://lan-party.com`
-- Admin: `http://lan-party.com/admin`
+- [Naam 1]
+- [Naam 2]

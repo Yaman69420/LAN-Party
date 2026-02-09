@@ -2,26 +2,30 @@
 declare(strict_types=1);
 
 /**
- * LAN-Party Public Website - Entry Point
+ * LAN-Party - Front Controller
+ * Dit is het enige entry point van de applicatie
  */
 
-// Start sessie
+// Start sessie voor CSRF en flash messages
 session_start();
 
-// Haal de request URI op
-$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$path = parse_url($requestUri, PHP_URL_PATH);
+// Laad autoloader
+require_once __DIR__ . '/autoload.php';
 
-// Simpele router - voeg hier je routes toe
-switch ($path) {
-    case '/':
-        // Homepage
-        include __DIR__ . '/views/home.php';
-        break;
-    
-    default:
-        // 404 - Pagina niet gevonden
-        http_response_code(404);
-        include __DIR__ . '/views/404.php';
-        break;
-}
+// Laad helpers
+require_once __DIR__ . '/../app/Core/helpers.php';
+
+use App\Core\Router;
+
+// Maak router aan
+$router = new Router();
+
+// ===========================================
+// ROUTES
+// ===========================================
+
+// Laad routes vanuit centraal bestand
+require __DIR__ . '/../app/routes.php';
+
+// Dispatch request naar juiste controller
+$router->dispatch();

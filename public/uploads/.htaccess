@@ -1,4 +1,0 @@
-# Uploads directory - beveiligd tegen directe PHP executie
-<FilesMatch "\.php$">
-    Require all denied
-</FilesMatch>

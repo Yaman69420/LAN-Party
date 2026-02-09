@@ -2,32 +2,33 @@
 declare(strict_types=1);
 
 /**
- * LAN-Party Admin Panel - Entry Point
+ * Admin Entry Point Workaround
+ * Dit bestand vangt requests naar /admin op (vanwege de VHost Alias)
+ * en stuurt ze door naar de hoofd-applicatie.
  */
 
-require_once __DIR__ . '/autoload.php';
+// Laad de autoloader van de hoofd-applicatie
+require_once __DIR__ . '/../public/autoload.php';
+
+// Laad helpers
+require_once __DIR__ . '/../app/Core/helpers.php';
+
+use App\Core\Router;
 
 // Start sessie
 session_start();
 
-// Haal de request URI op
-$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$path = parse_url($requestUri, PHP_URL_PATH);
+// Maak router aan
+$router = new Router();
 
-// Verwijder /admin prefix
-$path = preg_replace('#^/admin#', '', $path) ?: '/';
+// Laad routes vanuit centraal bestand
+require __DIR__ . '/../app/routes.php';
 
-// Simpele router - voeg hier je routes toe
-switch ($path) {
-    case '/':
-    case '/dashboard':
-        // Dashboard view
-        include __DIR__ . '/views/dashboard.php';
-        break;
-    
-    default:
-        // 404 - Pagina niet gevonden
-        http_response_code(404);
-        include __DIR__ . '/views/404.php';
-        break;
-}
+// Verwijder query parameters indien nodig voor path matching
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Zorg dat Router werkt met deze path
+$_SERVER['REQUEST_URI'] = $path; 
+
+// Dispatch
+$router->dispatch();
