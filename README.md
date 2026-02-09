@@ -4,17 +4,18 @@ Een PHP MVC project voor LAN-Party evenementen.
 
 ## Vereisten
 
-- PHP 8.0+ (met pdo_pgsql extensie)
-- Supabase account (PostgreSQL database)
-- MAMP/XAMPP of vergelijkbare lokale server
+- PHP 8.0+
+- MySQL (via MAMP/XAMPP)
+- phpMyAdmin voor database beheer
 
 ## Installatie
 
 1. Clone de repository
-2. Kopieer `admin/config/database.example.php` naar `admin/config/database.php`
-3. Vul je Supabase database gegevens in (te vinden in Supabase Dashboard > Settings > Database)
-4. Database naam: `lan_party_db`
-5. Configureer je virtual host naar de `public` map
+2. Maak database `lan_party_db` aan in phpMyAdmin
+3. Kopieer `admin/config/database.example.php` naar `admin/config/database.php`
+4. Vul je database gegevens in
+5. Voer de migrations uit (zie `migrations/README.md`)
+6. Configureer je virtual host naar de `public` map
 
 ## Projectstructuur
 
@@ -22,21 +23,22 @@ Een PHP MVC project voor LAN-Party evenementen.
 LAN-Party/
 ├── admin/                    # Backend (admin panel)
 │   ├── classes/Admin/        # PHP classes
-│   │   ├── Controllers/      # Controllers
-│   │   ├── Models/           # Database models
-│   │   ├── Services/         # Business logic
-│   │   └── Middleware/       # Request middleware
 │   ├── config/               # Configuratie bestanden
-│   ├── includes/             # Helpers en utilities
 │   └── views/                # Admin views
 ├── public/                   # Publieke website (DocumentRoot)
 │   ├── assets/               # CSS, JS, afbeeldingen
-│   ├── uploads/              # User uploads
 │   └── views/                # Publieke views
+├── migrations/               # Database schema wijzigingen
 └── .htaccess                 # URL rewriting
 ```
 
+## Database Workflow (Team)
+
+1. Maak schema wijziging → nieuw bestand in `migrations/`
+2. Commit en push naar `dev` branch
+3. Teamgenoten pullen en voeren nieuwe SQL uit in phpMyAdmin
+
 ## Ontwikkeling
 
-- Publieke website: `http://lan-party.com`
-- Admin panel: `http://lan-party.com/admin`
+- Website: `http://lan-party.com`
+- Admin: `http://lan-party.com/admin`

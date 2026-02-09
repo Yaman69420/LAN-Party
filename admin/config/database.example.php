@@ -1,15 +1,13 @@
 <?php
 declare(strict_types=1);
 
-// Kopieer dit bestand naar database.php en vul je Supabase gegevens in.
-// Je vindt deze in je Supabase dashboard onder: Settings > Database > Connection string
+// Kopieer dit bestand naar database.php en vul je MAMP gegevens in.
 
 return [
-    'host' => 'db.xxxxxxxxxxxx.supabase.co',  // Jouw Supabase host
-    'port' => 5432,                            // PostgreSQL port (standaard 5432, of 6543 voor pooler)
+    'host' => '127.0.0.1',
+    'port' => 8889,                // MAMP MySQL port (standaard 8889)
     'dbname' => 'lan_party_db',
-    'user' => 'postgres',                      // Of je eigen database user
-    'pass' => 'jouw_database_wachtwoord',
-    'charset' => 'utf8',
-    'driver' => 'pgsql',                       // PostgreSQL driver
+    'user' => 'root',
+    'pass' => 'root',              // MAMP standaard wachtwoord
+    'charset' => 'utf8mb4',
 ];
