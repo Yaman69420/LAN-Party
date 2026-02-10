@@ -45,6 +45,12 @@ class UserRepository
         ]);
     }
 
+    public function findBySlug(string $slug): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE slug = :slug LIMIT 1");
+        $stmt->execute(['slug' => $slug]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
     public function findByEmail(string $email): ?User {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
