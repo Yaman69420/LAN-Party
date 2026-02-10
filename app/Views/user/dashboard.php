@@ -16,6 +16,18 @@ if (!function_exists('safe')) {
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <div class="mt-4" x-data="{ selectedDate: null }">
+    <!-- Success Notification for Proposal -->
+    <?php if (($_GET['status'] ?? '') === 'proposal_sent'): ?>
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-[#0b0c10] border border-cyber-purple/50 text-cyber-purple px-8 py-6 rounded-sm shadow-[0_0_50px_rgba(188,19,254,0.4)] flex flex-col items-center gap-4 backdrop-blur-md text-center">
+        <div class="text-4xl mb-2">🛰️</div>
+        <div>
+            <h4 class="font-orbitron text-lg font-bold uppercase tracking-wider mb-1">TRANSMISSION SENT</h4>
+            <p class="font-mono text-sm text-white/70">Operation proposal uploaded to command center.</p>
+        </div>
+        <button @click="show = false" class="text-xs uppercase tracking-widest text-white/30 hover:text-white mt-2">[ DISMISS ]</button>
+    </div>
+    <?php endif; ?>
     <div class="mb-6 flex justify-between items-end">
         <div>
             <div class="flex items-center space-x-2 text-cyber-purple mb-2">
