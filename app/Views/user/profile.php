@@ -7,7 +7,7 @@
             <?php foreach ($pendingRequests as $request): ?>
                 <div class="flex items-center justify-between bg-black/40 p-3 border border-white/5">
                     <span class="text-white text-sm font-bold tracking-wide">
-                        <?= htmlspecialchars($request['username']) ?> wants to join your squad.
+                        <?= e($request['username']) ?> wants to join your squad.
                     </span>
                     <div class="flex space-x-2">
                         <form action="/user/accept-friend" method="POST">
@@ -31,7 +31,7 @@
             <div class="w-24 h-24 rounded border border-cyber-cyan p-1 shadow-[0_0_15px_rgba(0,242,255,0.2)] mb-4">
                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['username']) ?>&background=0b0c10&color=00f2ff&bold=true" class="rounded w-full h-full object-cover" alt="Avatar">
             </div>
-            <h2 class="font-orbitron text-xl text-white tracking-widest uppercase italic"><?= htmlspecialchars($user['username']) ?></h2>
+            <h2 class="font-orbitron text-xl text-white tracking-widest uppercase italic"><?= e($user['username']) ?></h2>
             <p class="text-[10px] text-cyber-cyan font-bold tracking-[0.3em] uppercase mt-2 opacity-80">
                 Status: <?= $isOwnProfile ? 'COMMANDER' : 'OPERATIVE' ?>
             </p>
@@ -59,7 +59,7 @@
                         <p class="col-span-4 text-[10px] text-white/20 italic">No squad members found.</p>
                     <?php else: ?>
                         <?php foreach($friends as $friend): ?>
-                            <a href="/user/profile?id=<?= $friend['id'] ?>" title="<?= htmlspecialchars($friend['username']) ?>">
+                            <a href="/user/profile/<?= e($friend['slug']) ?>" title="<?= e($friend['username']) ?>">
                                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($friend['username']) ?>&background=12141a&color=bc13fe" class="w-10 h-10 border border-white/10 hover:border-cyber-purple transition-all" alt="Friend">
                             </a>
                         <?php endforeach; ?>
@@ -89,7 +89,7 @@
                     <?php foreach($upcoming as $lan): ?>
                         <div class="flex justify-between items-center p-4 bg-black/20 border-l-2 border-cyber-cyan">
                             <div>
-                                <h4 class="text-white font-bold uppercase text-sm"><?= htmlspecialchars($lan['name']) ?></h4>
+                                <h4 class="text-white font-bold uppercase text-sm"><?= e($lan['name']) ?></h4>
                                 <p class="text-[10px] text-cyber-gray opacity-60 uppercase"><?= date('d M Y', strtotime($lan['start_date'])) ?></p>
                             </div>
                             <span class="text-[10px] text-cyber-cyan font-mono">[ ACTIVE ]</span>
@@ -108,7 +108,7 @@
                     <?php else: ?>
                         <?php foreach($history as $lan): ?>
                             <div class="flex justify-between items-center p-3 border-b border-white/5">
-                                <span class="text-xs text-white/40 uppercase"><?= htmlspecialchars($lan['name']) ?></span>
+                                <span class="text-xs text-white/40 uppercase"><?= e($lan['name']) ?></span>
                                 <span class="text-[9px] font-mono text-white/20"><?= date('Y', strtotime($lan['start_date'])) ?></span>
                             </div>
                         <?php endforeach; ?>

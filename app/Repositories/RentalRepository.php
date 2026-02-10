@@ -50,7 +50,8 @@ class RentalRepository
             ORDER BY r.created_at ASC
         ";
         
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
@@ -69,7 +70,8 @@ class RentalRepository
             ORDER BY r.created_at DESC
         ";
         
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 

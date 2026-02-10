@@ -17,7 +17,9 @@ $router->get('/logout', 'AuthController', 'logout');
 
 // Profile & Social
 $router->get('/profile', 'ProfileController', 'index');
-$router->get('/user/profile', 'ProfileController', 'viewUser');
+$router->get('/profile', 'ProfileController', 'index'); // Eigen profiel
+$router->get('/user/profile/{slug}', 'ProfileController', 'viewUser'); // Ander profiel via slug
+$router->get('/user/profile', 'ProfileController', 'viewUser'); // Fallback voor oude ID-links
 $router->get('/user/search', 'ProfileController', 'search');
 $router->post('/user/add-friend', 'ProfileController', 'addFriend');
 $router->post('/user/accept-friend', 'ProfileController', 'acceptFriend');
@@ -46,9 +48,10 @@ $router->post('/admin/lans/status', 'AdminController', 'updateLanStatus');
 // Admin Resources
 $router->get('/admin/resources', 'AdminController', 'resources');
 $router->get('/admin/resources/create', 'AdminController', 'resourceCreate');
-$router->post('/admin/resources/create', 'AdminController', 'resourceStore');
-$router->get('/admin/resources/edit', 'AdminController', 'resourceEdit');
-$router->post('/admin/resources/edit', 'AdminController', 'resourceUpdate');
+$router->post('/admin/resources/store', 'AdminController', 'resourceStore');
+$router->get('/admin/resources/edit/{slug}', 'AdminController', 'resourceEdit'); // Edit via slug
+$router->get('/admin/resources/edit', 'AdminController', 'resourceEdit'); // Fallback ID
+$router->post('/admin/resources/update', 'AdminController', 'resourceUpdate');
 $router->post('/admin/resources/delete', 'AdminController', 'resourceDelete');
 
 // Admin Reservations

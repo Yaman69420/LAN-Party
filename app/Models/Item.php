@@ -11,4 +11,5 @@ class Item
     public int $total_stock;
     public string $created_at;
     public ?string $deleted_at = null;
+    public ?string $slug = null;
 }
