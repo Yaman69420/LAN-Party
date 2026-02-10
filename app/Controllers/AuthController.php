@@ -33,9 +33,16 @@ class AuthController
         }
     }
 
-    public function showLogin(): void {
-        if (isset($_SESSION['user'])) { header("Location: /dashboard"); exit; }
-        view('auth/login');
+    public function showLogin(): void
+    {
+        if (isset($_SESSION['user'])) {
+            header("Location: /dashboard");
+            exit;
+        }
+
+        // We gebruiken hier NIET de view() helper van je collega als die automatisch de sidebar laadt
+        // We laden het bestand puur en alleen:
+        require_once __DIR__ . '/../Views/auth/login.php';
     }
 
     public function showRegister(): void {
@@ -54,8 +61,8 @@ class AuthController
 
         // Basic validation
         if (empty($username) || empty($email) || empty($password)) {
-             view('auth/register', ['error' => 'Vul alle verplichte velden in.']);
-             return;
+            view('auth/register', ['error' => 'Vul alle verplichte velden in.']);
+            return;
         }
 
         // Check if user already exists

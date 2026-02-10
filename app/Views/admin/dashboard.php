@@ -3,4 +3,5 @@
 <ul>
     <li><a href="/admin/users">Gebruikers beheren</a></li>
     <li><a href="/admin/approvals">Aanvragen goedkeuren</a></li>
+    <li><a href="/admin/resources">Resources beheren (The Armory)</a></li>
 </ul>
