@@ -4,13 +4,6 @@ $month = 2;
 $year = 2026;
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 $firstDayOfMonth = date('w', strtotime("$year-$month-01"));
-
-// Hulpfunctie voor veiligheid (als e() niet bestaat)
-if (!function_exists('safe')) {
-    function safe($value) {
-        return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
-    }
-}
 ?>
 
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -82,7 +75,7 @@ if (!function_exists('safe')) {
 
                     <?php if ($hasParty): ?>
                         <div class="text-[9px] leading-tight uppercase font-bold truncate w-full <?= ($day % 2 === 0) ? 'text-cyber-purple' : 'text-cyber-cyan' ?>">
-                            <?= safe($partyTitle) ?>
+                            <?= e($partyTitle) ?>
                         </div>
                         <div class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full <?= ($day % 2 === 0) ? 'bg-cyber-purple shadow-[0_0_5px_#bc13fe]' : 'bg-cyber-cyan shadow-[0_0_5px_#00f2ff]' ?>"></div>
                     <?php endif; ?>
@@ -93,8 +86,8 @@ if (!function_exists('safe')) {
 
                                 <div class="flex justify-between items-start mb-3 border-b border-white/10 pb-2">
                                     <div>
-                                        <h3 class="text-xs font-orbitron text-cyber-cyan uppercase italic font-bold"><?= safe($partyTitle) ?></h3>
-                                        <p class="text-[9px] text-white/50 uppercase mt-1">📍 <?= safe($party['location'] ?? 'Locatie TBD') ?></p>
+                                        <h3 class="text-xs font-orbitron text-cyber-cyan uppercase italic font-bold"><?= e($partyTitle) ?></h3>
+                                        <p class="text-[9px] text-white/50 uppercase mt-1">📍 <?= e($party['location'] ?? 'Locatie TBD') ?></p>
                                     </div>
                                     <button @click.stop="selectedDate = null" class="text-white/20 hover:text-white transition-colors">&times;</button>
                                 </div>
@@ -105,8 +98,8 @@ if (!function_exists('safe')) {
                                         <div class="bg-white/5 p-2 rounded border border-white/5">
                                             <?php foreach ($party['items'] as $item): ?>
                                                 <div class="flex justify-between text-[10px] py-0.5">
-                                                    <span class="text-white/80"><?= safe($item['name']) ?></span>
-                                                    <span class="text-cyber-cyan font-mono"><?= safe($item['qty']) ?>x</span>
+                                                    <span class="text-white/80"><?= e($item['name']) ?></span>
+                                                    <span class="text-cyber-cyan font-mono"><?= e($item['qty']) ?>x</span>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -152,8 +145,8 @@ if (!function_exists('safe')) {
                     <?php if (!empty($rentals)): ?>
                         <?php foreach ($rentals as $rental): ?>
                         <tr class="hover:bg-white/5 transition-colors">
-                            <td class="p-4 text-sm text-white font-bold"><?= safe($rental->item_name) ?></td>
-                            <td class="p-4 text-xs text-cyber-cyan font-mono"><?= safe($rental->category) ?></td>
+                            <td class="p-4 text-sm text-white font-bold"><?= e($rental->item_name) ?></td>
+                            <td class="p-4 text-xs text-cyber-cyan font-mono"><?= e($rental->category) ?></td>
                             <td class="p-4 text-xs text-gray-400 font-mono"><?= date('d M H:i', strtotime($rental->created_at)) ?></td>
                             <td class="p-4 text-xs text-white font-mono font-bold">
                                 <?= !empty($rental->reservation_date) ? date('d M H:i', strtotime($rental->reservation_date)) : '-' ?>
@@ -169,7 +162,7 @@ if (!function_exists('safe')) {
                                     $color = $statusColors[$rental->rental_status] ?? 'text-gray-400';
                                 ?>
                                 <span class="text-[10px] uppercase font-bold tracking-wider <?= $color ?> border border-current px-2 py-1 rounded-sm">
-                                    <?= safe($rental->rental_status) ?>
+                                    <?= e($rental->rental_status) ?>
                                 </span>
                             </td>
                         </tr>

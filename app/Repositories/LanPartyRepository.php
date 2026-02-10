@@ -13,6 +13,12 @@ class LanPartyRepository {
         $this->db = Database::getInstance()->getConnection();
     }
 
+    public function findBySlug(string $slug): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE slug = :slug LIMIT 1");
+        $stmt->execute(['slug' => $slug]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
     public function getUpcomingForUser(int $userId): array {
         $sql = "SELECT DISTINCT lp.* FROM lan_parties lp JOIN rentals r ON lp.id = r.lan_party_id
                 WHERE r.user_id = :uid AND lp.start_date >= CURDATE() AND lp.status = 'approved' ORDER BY lp.start_date ASC";
@@ -47,7 +53,8 @@ class LanPartyRepository {
             WHERE lp.status = 'approved'
             ORDER BY lp.start_date ASC";
 
-        $stmt = $this->db->query($sql);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $parties = [];
@@ -78,13 +85,21 @@ class LanPartyRepository {
      */
     public function create(string $name, string $description, int $attendees, string $email, string $start, string $end, int $organizerId): bool
     {
-        $sql = "INSERT INTO lan_parties (name, description, expected_attendees, contact_email, start_date, end_date, status, organizer_id, created_at) 
-            VALUES (:name, :description, :attendees, :email, :start_date, :end_date, 'proposed', :organizer_id, NOW())";
+        // Slug generatie
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name), '-'));
+        // Uniek maken indien nodig
+        if ($this->findBySlug($slug)) {
+            $slug .= '-' . time();
+        }
+
+        $sql = "INSERT INTO lan_parties (name, slug, description, expected_attendees, contact_email, start_date, end_date, status, organizer_id, created_at) 
+            VALUES (:name, :slug, :description, :attendees, :email, :start_date, :end_date, 'proposed', :organizer_id, NOW())";
 
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
             'name'        => $name,
+            'slug'        => $slug,
             'description' => $description,
             'attendees'   => $attendees,
             'email'       => $email,
@@ -99,7 +114,9 @@ class LanPartyRepository {
             FROM lan_parties lp 
             LEFT JOIN users u ON lp.organizer_id = u.id 
             ORDER BY lp.created_at DESC";
-        return $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function updateStatus(int $id, string $status): bool {

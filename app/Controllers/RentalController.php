@@ -26,7 +26,13 @@ class RentalController
         $userId = $_SESSION['user']['id'];
         $reservationDate = $_POST['reservation_date'] ?? date('Y-m-d H:i:s'); // Fallback naar NU als leeg
         
-        // Simpele insert zonder validatie (zoals gevraagd in de issue: formulier focus)
+        // 1. Stock Check (Validatie)
+        $item = $this->itemRepo->find($itemId);
+        if (!$item || $item->total_stock <= 0) {
+            redirect('/resources?status=error&message=out_of_stock');
+        }
+
+        // 2. Reservering Opslaan
         // In een echte app zouden we stock checken en transaction gebruiken.
         $db = \App\Core\Database::getInstance()->getConnection();
         $stmt = $db->prepare("INSERT INTO rentals (user_id, item_id, quantity, reservation_date) VALUES (:user_id, :item_id, 1, :reservation_date)");

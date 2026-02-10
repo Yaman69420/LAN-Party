@@ -12,6 +12,25 @@
     </div>
     <?php endif; ?>
 
+    <!-- Error Notification -->
+    <?php if (($_GET['status'] ?? '') === 'error'): ?>
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-[#0b0c10] border border-red-500/50 text-red-400 px-8 py-6 rounded-sm shadow-[0_0_50px_rgba(239,68,68,0.4)] flex flex-col items-center gap-4 backdrop-blur-md text-center">
+        <div class="text-4xl mb-2">🚫</div>
+        <div>
+            <h4 class="font-orbitron text-lg font-bold uppercase tracking-wider mb-1">ACCESS DENIED</h4>
+            <p class="font-mono text-sm text-white/70">
+                <?php 
+                    $msg = $_GET['message'] ?? 'Unknown error';
+                    if ($msg === 'out_of_stock') echo 'Resource depleted. Requisition failed.';
+                    else echo htmlspecialchars($msg);
+                ?>
+            </p>
+        </div>
+        <button @click="show = false" class="text-xs uppercase tracking-widest text-white/30 hover:text-white mt-2">[ DISMISS ]</button>
+    </div>
+    <?php endif; ?>
+
     <!-- Reservation Modal -->
     <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showModal = false"></div>

@@ -47,7 +47,7 @@
 
                 <td class="py-6 text-right pr-4">
                     <div class="flex justify-end space-x-6 items-center">
-                        <a href="/admin/resources/edit?id=<?= $item->id ?>" class="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors tracking-widest">
+                        <a href="/admin/resources/edit/<?= e($item->slug) ?>" class="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors tracking-widest">
                             Edit
                         </a>
 

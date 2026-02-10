@@ -47,20 +47,35 @@ class ProfileController
 
     /**
      * Het profiel van iemand anders bekijken
+     * Opgelost: Gebruikt nu de logica van de 'dev' branch (slugs + id support)
      */
-    public function viewUser(): void {
-        $targetId = (int)($_GET['id'] ?? 0);
-        $myId = (int)$_SESSION['user']['id'];
+    public function viewUser(?string $slug = null): void {
+        $targetId = 0;
+        $user = null;
 
-        // Als je naar jezelf kijkt, stuur door naar index
-        if ($targetId === $myId) {
-            header('Location: /profile');
-            exit;
+        // 1. Zoek op basis van slug (nieuwe manier)
+        if ($slug) {
+            $user = $this->userRepo->findBySlug($slug);
+        } 
+        // 2. Fallback: Zoek op basis van ID (oude manier, via $_GET)
+        elseif (isset($_GET['id'])) {
+            $user = $this->userRepo->findById((int)$_GET['id']);
         }
 
-        $user = $this->userRepo->findById($targetId);
-        if (!$user) {
-            header('Location: /dashboard');
+        // 3. Validatie: Bestaat de user niet? Terug naar dashboard.
+        if (!$user) { 
+            header('Location: /dashboard'); 
+            exit; 
+        }
+
+        // Zorg dat user altijd een array is voor consistentie
+        $user = (array)$user;
+        $targetId = (int)$user['id'];
+        $myId = (int)$_SESSION['user']['id'];
+
+        // Als je naar jezelf kijkt, stuur door naar je eigen profiel
+        if ($targetId === $myId) {
+            header('Location: /profile');
             exit;
         }
 
@@ -71,7 +86,7 @@ class ProfileController
             'friendshipStatus' => $status,
             'isOwnProfile' => false,
             'friends' => $this->userRepo->getFriends($targetId),
-            // Alleen missies tonen als ze vrienden zijn
+            // Alleen missies tonen als ze vrienden zijn (privacy check)
             'history' => ($status === 'accepted') ? $this->lanRepo->getHistoryForUser($targetId) : [],
             'upcoming' => ($status === 'accepted') ? $this->lanRepo->getUpcomingForUser($targetId) : []
         ]);
@@ -81,6 +96,7 @@ class ProfileController
      * Vriendschapsverzoek versturen
      */
     public function addFriend(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
         $friendId = (int)($_POST['friend_id'] ?? 0);
         if ($friendId > 0) {
             $this->userRepo->sendFriendRequest((int)$_SESSION['user']['id'], $friendId);
@@ -97,7 +113,7 @@ class ProfileController
 
         $requestId = (int)($_POST['request_id'] ?? 0);
         if ($requestId > 0) {
-            $this->userRepo->acceptFriendRequest($requestId);
+            $this->userRepo->acceptFriendRequest($requestId, (int)$_SESSION['user']['id']);
         }
 
         header('Location: /profile');

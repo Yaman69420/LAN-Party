@@ -27,41 +27,114 @@ class UserRepository
         }
     }
 
-    // --- AUTHENTICATIE (Login & Profiel) ---
-    // Deze geven een OBJECT terug ($user->password_hash) voor de AuthController
+    // --- LEES OPERATIES (FINDERS) ---
 
     public function findById(int $id)
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_ASSOC); // Aangepast naar ASSOC voor consistentie met dev
+    }
+
+    public function findBySlug(string $slug): ?array 
+    {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE slug = :slug LIMIT 1");
+        $stmt->execute(['slug' => $slug]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 
     public function findByEmail(string $email)
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function findByUsername(string $username)
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
         $stmt->execute(['username' => $username]);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
-    // --- ADMIN PANEL FUNCTIE (DEZE MISTE JE) ---
 
     public function getAllUsers(): array
     {
         $stmt = $this->db->prepare("SELECT * FROM users ORDER BY created_at DESC");
         $stmt->execute();
-        // We geven arrays terug, dat werkt meestal het makkelijkst in admin tabellen
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- PROFIEL UPDATEN ---
+    // --- ZOEK & SOCIAAL ---
+
+    public function searchUsers(string $query, int $excludeId): array 
+    {
+        // De 'dev' versie is beter: selecteert specifieke kolommen en gebruikt slug
+        $stmt = $this->db->prepare("SELECT id, username, first_name, last_name, slug, profile_image FROM users WHERE username LIKE :q AND id != :excl LIMIT 10");
+        $stmt->execute(['q' => "%$query%", 'excl' => $excludeId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getFriends(int $userId): array 
+    {
+        // De 'dev' versie met de JOIN is veel efficiënter dan losse queries
+        $sql = "SELECT u.id, u.username, u.slug, u.profile_image, u.first_name, u.last_name 
+                FROM users u
+                JOIN friends f ON (u.id = f.friend_id OR u.id = f.user_id)
+                WHERE (f.user_id = :uid1 OR f.friend_id = :uid2)
+                AND u.id != :uid3 AND f.status = 'accepted'";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'uid1' => $userId,
+            'uid2' => $userId,
+            'uid3' => $userId
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getFriendshipStatus(int $userId, int $friendId): ?string 
+    {
+        $sql = "SELECT status FROM friends 
+                WHERE (user_id = :u1 AND friend_id = :f1) 
+                   OR (user_id = :f2 AND friend_id = :u2)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'u1' => $userId,
+            'f1' => $friendId,
+            'f2' => $friendId,
+            'u2' => $userId
+        ]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['status'] : null;
+    }
+
+    public function sendFriendRequest(int $userId, int $friendId): bool 
+    {
+        if ($this->getFriendshipStatus($userId, $friendId)) return false;
+
+        $sql = "INSERT INTO friends (user_id, friend_id, status, created_at) VALUES (:u, :f, 'pending', NOW())";
+        return $this->db->prepare($sql)->execute(['u' => $userId, 'f' => $friendId]);
+    }
+
+    public function getPendingRequests(int $userId): array 
+    {
+        $sql = "SELECT f.id as request_id, u.id, u.username, u.profile_image 
+                FROM friends f
+                JOIN users u ON f.user_id = u.id
+                WHERE f.friend_id = :id AND f.status = 'pending'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function acceptFriendRequest(int $requestId, int $userId): bool 
+    {
+        $sql = "UPDATE friends SET status = 'accepted' WHERE id = :id AND friend_id = :uid";
+        return $this->db->prepare($sql)->execute(['id' => $requestId, 'uid' => $userId]);
+    }
+
+    // --- SCHRIJF OPERATIES (CREATE / UPDATE) ---
 
     public function updateProfile(int $id, array $data): bool
     {
@@ -81,74 +154,28 @@ class UserRepository
         ]);
     }
 
-    // --- SQUAD / VRIENDEN FUNCTIES ---
+    public function create(string $username, string $email, string $passwordhash, string $firstName = '', string $lastName = ''): bool 
+    {
+        // Slug generatie (uit dev branch)
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $username), '-'));
+        
+        // Uniek maken indien nodig
+        if ($this->findBySlug($slug)) {
+            $slug .= '-' . time();
+        }
 
-    public function searchUsers(string $query, int $excludeId): array {
-        $sql = "SELECT * FROM users 
-                WHERE (username LIKE :q1 OR first_name LIKE :q2 OR last_name LIKE :q3) 
-                AND id != :id 
-                LIMIT 10";
-        $stmt = $this->db->prepare($sql);
-        $term = "%$query%";
-        $stmt->execute([
-            'q1' => $term,
-            'q2' => $term,
-            'q3' => $term,
-            'id' => $excludeId
+        $stmt = $this->db->prepare("
+            INSERT INTO users (username, slug, email, password_hash, first_name, last_name, role, is_active) 
+            VALUES (:username, :slug, :email, :password_hash, :first_name, :last_name, 'user', 1)
+        ");
+        
+        return $stmt->execute([
+            'username' => $username, 
+            'slug' => $slug,
+            'email' => $email, 
+            'password_hash' => $passwordhash,
+            'first_name' => $firstName, 
+            'last_name' => $lastName
         ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getFriendshipStatus(int $userId, int $friendId): ?string {
-        $sql = "SELECT status FROM friends 
-                WHERE (user_id = :u1 AND friend_id = :f1) 
-                   OR (user_id = :f2 AND friend_id = :u2)";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'u1' => $userId,
-            'f1' => $friendId,
-            'f2' => $friendId,
-            'u2' => $userId
-        ]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ? $result['status'] : null;
-    }
-
-    public function sendFriendRequest(int $userId, int $friendId): bool {
-        if ($this->getFriendshipStatus($userId, $friendId)) return false;
-
-        $sql = "INSERT INTO friends (user_id, friend_id, status, created_at) VALUES (:u, :f, 'pending', NOW())";
-        return $this->db->prepare($sql)->execute(['u' => $userId, 'f' => $friendId]);
-    }
-
-    public function getPendingRequests(int $userId): array {
-        $sql = "SELECT f.id as request_id, u.id, u.username, u.profile_image 
-                FROM friends f
-                JOIN users u ON f.user_id = u.id
-                WHERE f.friend_id = :id AND f.status = 'pending'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function acceptFriendRequest(int $requestId): bool {
-        $sql = "UPDATE friends SET status = 'accepted' WHERE id = :id";
-        return $this->db->prepare($sql)->execute(['id' => $requestId]);
-    }
-
-    public function getFriends(int $userId): array {
-        $sql = "SELECT u.* FROM users u
-                JOIN friends f ON (u.id = f.friend_id OR u.id = f.user_id)
-                WHERE (f.user_id = :uid1 OR f.friend_id = :uid2)
-                AND f.status = 'accepted'
-                AND u.id != :uid3";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'uid1' => $userId,
-            'uid2' => $userId,
-            'uid3' => $userId
-        ]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
