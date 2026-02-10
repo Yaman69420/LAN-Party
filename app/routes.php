@@ -30,19 +30,27 @@ $router->get('/dashboard', 'UserDashboardController', 'index');
 // --- 4. Overige Gebruiker Pagina's ---
 $router->get('/resources', 'RentalController', 'index');
 $router->post('/rentals/store', 'RentalController', 'store');
-$router->get('/propose', 'ProposeController', 'index');
-$router->post('/propose', 'ProposeController', 'store');
+
+// Proposals
+$router->get('/proposals', 'ProposeController', 'list');      // De LIJST
+$router->post('/proposals/join', 'ProposeController', 'join');// Join actie
+$router->post('/proposals/unjoin', 'ProposeController', 'unjoin'); // Unjoin actie
+$router->get('/propose', 'ProposeController', 'create');      // Het FORMULIER
+$router->post('/propose', 'ProposeController', 'store');      // Opslaan formulier
 
 // --- 5. Admin Sectie (Slechts 1 keer!) ---
 $router->get('/admin', 'AdminController', 'index');
+
+// Admin - Users
 $router->get('/admin/users', 'AdminController', 'users');
-
 $router->get('/admin/users/edit', 'AdminController', 'userEdit');
-$router->post('/admin/users/edit', 'AdminController', 'userUpdate');
-$router->post('/admin/users/toggle', 'AdminController', 'toggleUserStatus');
+$router->post('/admin/users/update', 'AdminController', 'userUpdate');
+$router->post('/admin/users/toggle-status', 'AdminController', 'toggleUserStatus');
 
-// DEZE MOET HIER STAAN:
+// Admin - LANs
 $router->get('/admin/lans', 'AdminController', 'lans');
+$router->get('/admin/lans/edit', 'AdminController', 'lanEdit'); // Nieuw
+$router->post('/admin/lans/update', 'AdminController', 'lanUpdate'); // Nieuw
 $router->post('/admin/lans/status', 'AdminController', 'updateLanStatus');
 
 // Admin Resources

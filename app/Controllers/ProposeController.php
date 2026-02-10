@@ -14,8 +14,24 @@ class ProposeController
         $this->lanRepo = new LanPartyRepository();
     }
 
-    // Toon het formulier
-    public function index(): void
+    // Toon de lijst met open proposals
+    public function list(): void
+    {
+        if (!isset($_SESSION['user'])) { header('Location: /login'); exit; }
+
+        $proposals = $this->lanRepo->getProposals();
+        
+        foreach ($proposals as &$prop) {
+            $prop['votes'] = $this->lanRepo->getVotes($prop['id']);
+            $prop['has_voted'] = $this->lanRepo->hasVoted($prop['id'], $_SESSION['user']['id']);
+        }
+        unset($prop);
+
+        view('user/proposals/index', ['proposals' => $proposals]);
+    }
+
+    // Toon het formulier ("Propose LAN")
+    public function create(): void
     {
         if (!isset($_SESSION['user'])) {
             header('Location: /login');
@@ -23,6 +39,28 @@ class ProposeController
         }
 
         view('user/propose');
+    }
+
+    public function join(): void {
+        if (!isset($_SESSION['user'])) { header('Location: /login'); exit; }
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $proposalId = (int)$_POST['proposal_id'];
+        $this->lanRepo->vote($proposalId, $_SESSION['user']['id']);
+
+        header('Location: /proposals?status=joined');
+        exit;
+    }
+
+    public function unjoin(): void {
+        if (!isset($_SESSION['user'])) { header('Location: /login'); exit; }
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $proposalId = (int)$_POST['proposal_id'];
+        $this->lanRepo->unvote($proposalId, $_SESSION['user']['id']);
+
+        header('Location: /proposals?status=unjoined');
+        exit;
     }
 
     // Verwerk het formulier (POST)

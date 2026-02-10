@@ -28,7 +28,10 @@ class ProfileController
             'friends' => $this->userRepo->getFriends($userId),
             'pendingRequests' => $this->userRepo->getPendingRequests($userId), // NIEUW
             'history' => $this->lanRepo->getHistoryForUser($userId),
-            'upcoming' => $this->lanRepo->getUpcomingForUser($userId),
+            'upcoming' => array_merge(
+                $this->lanRepo->getUpcomingForUser($userId),
+                $this->lanRepo->getProposalsForUser($userId) // Add proposals to upcoming
+            ),
             'isOwnProfile' => true
         ]);
     }
@@ -72,7 +75,10 @@ class ProfileController
             'isOwnProfile' => false,
             'friends' => $this->userRepo->getFriends($targetId),
             'history' => ($status === 'accepted') ? $this->lanRepo->getHistoryForUser($targetId) : [],
-            'upcoming' => ($status === 'accepted') ? $this->lanRepo->getUpcomingForUser($targetId) : []
+            'upcoming' => ($status === 'accepted') ? array_merge(
+                $this->lanRepo->getUpcomingForUser($targetId),
+                $this->lanRepo->getProposalsForUser($targetId)
+            ) : []
         ]);
     }
 

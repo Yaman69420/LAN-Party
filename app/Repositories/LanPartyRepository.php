@@ -124,4 +124,97 @@ class LanPartyRepository {
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['status' => $status, 'id' => $id]);
     }
+
+    /**
+     * Haal alle proposals op (status = 'proposed')
+     */
+    public function getProposals(): array {
+        $sql = "SELECT lp.*, u.username as organizer
+                FROM lan_parties lp 
+                LEFT JOIN users u ON lp.organizer_id = u.id 
+                WHERE lp.status = 'proposed' 
+                ORDER BY lp.created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Stem op een proposal (of schrijf je in)
+     */
+    public function vote(int $proposalId, int $userId): bool {
+        // Check of al gestemd is
+        if ($this->hasVoted($proposalId, $userId)) {
+            return false;
+        }
+        $stmt = $this->db->prepare("INSERT INTO proposal_votes (lan_party_id, user_id) VALUES (:pid, :uid)");
+        return $stmt->execute(['pid' => $proposalId, 'uid' => $userId]);
+    }
+
+    /**
+     * Check of user al gestemd heeft
+     */
+    public function hasVoted(int $proposalId, int $userId): bool {
+        $stmt = $this->db->prepare("SELECT id FROM proposal_votes WHERE lan_party_id = :pid AND user_id = :uid");
+        $stmt->execute(['pid' => $proposalId, 'uid' => $userId]);
+        return (bool)$stmt->fetch();
+    }
+
+    /**
+     * Haal stemmers op voor een proposal
+     */
+    public function getVotes(int $proposalId): array {
+        $sql = "SELECT u.username, u.id 
+                FROM proposal_votes pv 
+                JOIN users u ON pv.user_id = u.id 
+                WHERE pv.lan_party_id = :pid";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['pid' => $proposalId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function unvote(int $proposalId, int $userId): bool {
+        $stmt = $this->db->prepare("DELETE FROM proposal_votes WHERE lan_party_id = :pid AND user_id = :uid");
+        return $stmt->execute(['pid' => $proposalId, 'uid' => $userId]);
+    }
+
+    /**
+     * Haal proposals op waar de user aan mee doet
+     */
+    public function getProposalsForUser(int $userId): array {
+        $sql = "SELECT lp.* 
+                FROM lan_parties lp 
+                JOIN proposal_votes pv ON lp.id = pv.lan_party_id 
+                WHERE pv.user_id = :uid AND lp.status = 'proposed' 
+                ORDER BY lp.start_date ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['uid' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function update(int $id, array $data): bool {
+        $sql = "UPDATE lan_parties SET 
+                name = :name, 
+                description = :description, 
+                expected_attendees = :attendees, 
+                contact_email = :email, 
+                start_date = :start_date, 
+                end_date = :end_date 
+                WHERE id = :id";
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'name'        => $data['name'],
+            'description' => $data['description'],
+            'attendees'   => $data['attendees'],
+            'email'       => $data['email'],
+            'start_date'  => $data['start_date'],
+            'end_date'    => $data['end_date'],
+            'id'          => $id
+        ]);
+    }
+    
+    public function findById(int $id): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
 }

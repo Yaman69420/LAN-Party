@@ -78,6 +78,11 @@ $isLoggedIn = ($user !== null);
                 <span class="font-medium tracking-wider uppercase text-sm">The Armory</span>
             </a>
 
+            <a href="/proposals" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-purple hover:bg-cyber-purple/5 border-l-4 border-transparent hover:border-cyber-purple transition-all duration-300">
+                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-purple group-hover:opacity-100 transition-opacity">📡</span>
+                <span class="font-medium tracking-wider uppercase text-sm">Proposals</span>
+            </a>
+
             <a href="/propose" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-purple hover:bg-cyber-purple/5 border-l-4 border-transparent hover:border-cyber-purple transition-all duration-300">
                 <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-purple group-hover:opacity-100 transition-opacity">🛰️</span>
                 <span class="font-medium tracking-wider uppercase text-sm">Propose LAN</span>
