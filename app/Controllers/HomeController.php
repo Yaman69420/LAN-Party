@@ -3,27 +3,14 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-/**
- * HomeController - Homepage
- */
 class HomeController
 {
-    public function index(): void
-    {
-        view('home');
-    }
-
-    public function dashboard(): void
-    {
-        requireLogin();
-        view('user/dashboard', [
-            'username' => user()['username']
-        ]);
-    }
-
-    public function propose(): void
-    {
-        requireLogin();
-        view('propose');
+    public function index(): void {
+        if (isset($_SESSION['user'])) {
+            header('Location: /dashboard');
+        } else {
+            header('Location: /login');
+        }
+        exit;
     }
 }

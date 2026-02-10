@@ -6,12 +6,18 @@ namespace App\Models;
 class User
 {
     public int $id;
+    public string $first_name;
+    public string $last_name;
     public string $username;
     public string $email;
-    public string $password;
+    public string $password_hash; // Changed from 'password' to match DB column
     public string $role;
-    public bool $is_active;
+    public int $is_active; // Changed to int to match TINYINT(1) DB return
     public string $created_at;
 
-    // Mag ook met constructor, maar public properties is vaak makkelijker voor FETCH_CLASS
+    // Helper to get full name
+    public function getFullName(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
 }
