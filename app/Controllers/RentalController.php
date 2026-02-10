@@ -36,6 +36,6 @@ class RentalController
             'reservation_date' => $reservationDate
         ]);
 
-        redirect('/resources');
+        redirect('/resources?status=success');
     }
 }
