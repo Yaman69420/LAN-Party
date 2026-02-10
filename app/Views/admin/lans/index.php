@@ -1,4 +1,8 @@
 <div class="bg-cyber-dark/60 p-8 rounded-sm border border-white/5 shadow-2xl">
+    <a href="/admin" class="inline-block mb-6 text-[10px] font-orbitron text-cyber-cyan/50 hover:text-cyber-cyan transition-all uppercase tracking-[0.3em]">
+        <span class="mr-2">«</span> Back to Command Center
+    </a>
+
     <h2 class="text-white font-orbitron text-2xl mb-8 uppercase italic tracking-widest border-b border-cyber-cyan/30 pb-4 neon-text-cyan">
         LAN Operation Control
     </h2>

@@ -6,32 +6,76 @@ namespace App\Controllers;
 use App\Repositories\ItemRepository;
 use App\Repositories\LanPartyRepository;
 use App\Repositories\RentalRepository;
+use App\Repositories\UserRepository; // TOEGEVOEGD
 
 class AdminController
 {
     private ItemRepository $itemRepo;
     private LanPartyRepository $lanRepo;
     private RentalRepository $rentalRepo;
+    private UserRepository $userRepo; // TOEGEVOEGD
 
     public function __construct() {
         requireAdmin();
         $this->itemRepo = new ItemRepository();
         $this->lanRepo = new LanPartyRepository();
         $this->rentalRepo = new RentalRepository();
+        $this->userRepo = new UserRepository(); // TOEGEVOEGD: Nu is hij niet meer 'null'
     }
 
     public function index(): void {
         view('admin/dashboard');
     }
 
+    // --- User Management (Nieuw & Hersteld) ---
+
     public function users(): void {
-        view('admin/users');
+        $users = $this->userRepo->getAllUsers();
+        view('admin/users/index', ['users' => $users]);
     }
 
-    // --- HIER ZAT DE FOUT: Deze functie is nodig voor de route /admin/lans ---
+    public function userEdit(): void {
+        $id = (int)($_GET['id'] ?? 0);
+        $user = $this->userRepo->findById($id);
+
+        if (!$user) {
+            header('Location: /admin/users');
+            exit;
+        }
+
+        view('admin/users/edit', ['user' => $user]);
+    }
+
+    public function userUpdate(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $data = [
+            'username' => $_POST['username'] ?? '',
+            'email'    => $_POST['email'] ?? '',
+            'role'     => $_POST['role'] ?? 'user'
+        ];
+
+        $this->userRepo->update($id, $data);
+        header('Location: /admin/users');
+        exit;
+    }
+
+    public function toggleUserStatus(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $id = (int)$_POST['id'];
+        $currentStatus = (int)$_POST['current_status'];
+
+        $this->userRepo->toggleUserStatus($id, $currentStatus);
+        header('Location: /admin/users');
+        exit;
+    }
+
+    // --- LAN Operations (Behouden) ---
+
     public function lans(): void {
         $parties = $this->lanRepo->getAllForAdmin();
-        // Let op: hij zoekt nu naar app/Views/admin/lans/index.php
         view('admin/lans/index', ['parties' => $parties]);
     }
 
@@ -47,7 +91,8 @@ class AdminController
         exit;
     }
 
-    // --- Resources ---
+    // --- Resources / The Armory (Behouden) ---
+
     public function resources(): void {
         $items = $this->itemRepo->getAll();
         view('admin/resources/index', ['items' => $items]);
@@ -77,17 +122,14 @@ class AdminController
     }
     public function resourceDelete(): void {
         if (!csrf_verify()) die('Invalid CSRF');
-
         $id = (int)($_POST['id'] ?? 0);
-        $repo = new \App\Repositories\ItemRepository();
-        $repo->softDelete($id);
-
-        redirect('/admin/resources');
+        $this->itemRepo->softDelete($id);
+        header('Location: /admin/resources'); exit;
     }
 
 
-    // --- Reservation Management ---
-    
+    // --- Reservation Management (Behouden) ---
+
     public function reservations(): void {
         $rentals = $this->rentalRepo->getAll();
         view('admin/reservations/index', ['rentals' => $rentals]);
@@ -98,15 +140,14 @@ class AdminController
 
         $id = (int)($_POST['id'] ?? 0);
         $status = $_POST['status'] ?? '';
-        
-        // Simpele validatie
+
         if (!in_array($status, ['reserved', 'declined', 'picked_up', 'returned'])) {
-            redirect('/admin/reservations');
+            header('Location: /admin/reservations');
             return;
         }
 
         $this->rentalRepo->updateStatus($id, $status);
-
-        redirect('/admin/reservations');
+        header('Location: /admin/reservations');
+        exit;
     }
 }
