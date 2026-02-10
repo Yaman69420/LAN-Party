@@ -114,4 +114,63 @@ if (!function_exists('safe')) {
             <?php endfor; ?>
         </div>
     </div>
+    </div>
+
+    </div>
+
+    <!-- My Reservations Section -->
+    <div class="mt-8">
+        <div class="flex items-center space-x-2 text-cyber-cyan mb-4">
+            <span class="text-xs">📦</span>
+            <span class="text-[10px] uppercase font-bold tracking-[0.3em]">Resource Requisitions</span>
+        </div>
+        
+        <div class="bg-cyber-dark/40 border border-white/5 rounded-sm backdrop-blur-sm overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-white/5 border-b border-white/10 text-[10px] uppercase tracking-wider text-white/50 font-orbitron">
+                        <th class="p-4 font-normal">Item</th>
+                        <th class="p-4 font-normal">Category</th>
+                        <th class="p-4 font-normal">Requested On</th>
+                        <th class="p-4 font-normal">For Date</th>
+                        <th class="p-4 font-normal text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <?php if (!empty($rentals)): ?>
+                        <?php foreach ($rentals as $rental): ?>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 text-sm text-white font-bold"><?= safe($rental->item_name) ?></td>
+                            <td class="p-4 text-xs text-cyber-cyan font-mono"><?= safe($rental->category) ?></td>
+                            <td class="p-4 text-xs text-gray-400 font-mono"><?= date('d M H:i', strtotime($rental->created_at)) ?></td>
+                            <td class="p-4 text-xs text-white font-mono font-bold">
+                                <?= !empty($rental->reservation_date) ? date('d M H:i', strtotime($rental->reservation_date)) : '-' ?>
+                            </td>
+                            <td class="p-4 text-right">
+                                <?php
+                                    $statusColors = [
+                                        'pending' => 'text-yellow-400',
+                                        'reserved' => 'text-green-400',
+                                        'picked_up' => 'text-blue-400',
+                                        'returned' => 'text-gray-500'
+                                    ];
+                                    $color = $statusColors[$rental->rental_status] ?? 'text-gray-400';
+                                ?>
+                                <span class="text-[10px] uppercase font-bold tracking-wider <?= $color ?> border border-current px-2 py-1 rounded-sm">
+                                    <?= safe($rental->rental_status) ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-gray-500 text-sm italic">
+                                Geen actieve reserveringen gevonden. <a href="/resources" class="text-cyber-cyan hover:underline">Ga naar The Armory</a>.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

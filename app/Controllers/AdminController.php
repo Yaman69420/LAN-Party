@@ -67,6 +67,40 @@ class AdminController
     }
     public function resourceDelete(): void {
         if (!csrf_verify()) die('Invalid CSRF');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $repo = new \App\Repositories\ItemRepository();
+        $repo->softDelete($id);
+
+        redirect('/admin/resources');
+    }
+
+    // --- Reservation Management ---
+    
+    public function reservations(): void {
+        $repo = new \App\Repositories\RentalRepository();
+        $rentals = $repo->getAll();
+        view('admin/reservations/index', ['rentals' => $rentals]);
+    }
+
+    public function reservationUpdate(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $id = (int)($_POST['id'] ?? 0);
+        $status = $_POST['status'] ?? '';
+        
+        // Simpele validatie
+        if (!in_array($status, ['reserved', 'declined', 'picked_up', 'returned'])) {
+            redirect('/admin/reservations');
+            return;
+        }
+
+        $repo = new \App\Repositories\RentalRepository();
+        $repo->updateStatus($id, $status);
+
+        redirect('/admin/reservations');
+    }
+}
         $this->itemRepo->delete((int)$_POST['id']);
         header('Location: /admin/resources'); exit;
     }

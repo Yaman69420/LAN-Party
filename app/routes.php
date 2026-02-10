@@ -20,6 +20,7 @@ $router->get('/dashboard', 'UserDashboardController', 'index');
 
 // --- 4. Overige Gebruiker Pagina's ---
 $router->get('/resources', 'RentalController', 'index');
+$router->post('/rentals/store', 'RentalController', 'store');
 $router->get('/propose', 'ProposeController', 'index');
 $router->post('/propose', 'ProposeController', 'store');
 
@@ -38,3 +39,7 @@ $router->post('/admin/resources/create', 'AdminController', 'resourceStore');
 $router->get('/admin/resources/edit', 'AdminController', 'resourceEdit');
 $router->post('/admin/resources/edit', 'AdminController', 'resourceUpdate');
 $router->post('/admin/resources/delete', 'AdminController', 'resourceDelete');
+
+// Admin Reservations
+$router->get('/admin/reservations', 'AdminController', 'reservations');
+$router->post('/admin/reservations/update', 'AdminController', 'reservationUpdate');
