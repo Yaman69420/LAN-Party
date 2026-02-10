@@ -61,8 +61,8 @@ class AuthController
 
         // Basic validation
         if (empty($username) || empty($email) || empty($password)) {
-             view('auth/register', ['error' => 'Vul alle verplichte velden in.']);
-             return;
+            view('auth/register', ['error' => 'Vul alle verplichte velden in.']);
+            return;
         }
 
         // Check if user already exists
