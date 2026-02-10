@@ -128,7 +128,9 @@ if (!function_exists('e')) {
                                 <h4 class="text-white font-bold uppercase text-sm"><?= e($lan['name']) ?></h4>
                                 <p class="text-[10px] text-cyber-gray opacity-60 uppercase"><?= date('d M Y', strtotime($lan['start_date'])) ?></p>
                             </div>
-                            <span class="text-[10px] text-cyber-cyan font-mono">[ ACTIVE ]</span>
+                            <span class="text-[10px] font-mono <?= $lan['status'] === 'approved' ? 'text-cyber-cyan' : 'text-cyber-purple' ?>">
+                                [ <?= strtoupper($lan['status']) ?> ]
+                            </span>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>

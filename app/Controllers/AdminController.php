@@ -91,6 +91,36 @@ class AdminController
         exit;
     }
 
+    public function lanEdit(): void {
+        $id = (int)($_GET['id'] ?? 0);
+        $lan = $this->lanRepo->findById($id);
+
+        if (!$lan) {
+            header('Location: /admin/lans');
+            exit;
+        }
+
+        view('admin/lans/edit', ['lan' => $lan]);
+    }
+
+    public function lanUpdate(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
+
+        $id = (int)$_POST['id'];
+        $data = [
+            'name'        => $_POST['name'],
+            'description' => $_POST['description'],
+            'attendees'   => (int)$_POST['attendees'],
+            'email'       => $_POST['email'],
+            'start_date'  => $_POST['start_date'],
+            'end_date'    => $_POST['end_date']
+        ];
+
+        $this->lanRepo->update($id, $data);
+        header('Location: /admin/lans');
+        exit;
+    }
+
     // --- Resources / The Armory (Behouden) ---
 
     public function resources(): void {

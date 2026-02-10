@@ -12,7 +12,7 @@
         <tr class="text-[11px] font-orbitron text-cyber-cyan/50 uppercase tracking-[0.2em] border-b border-white/10">
             <th class="pb-4 pl-4 w-1/3">Operation & Intel</th>
             <th class="pb-4 w-1/4">Contact & Units</th>
-            <th class="pb-4 text-right pr-4">Authorization Status</th>
+            <th class="pb-4 text-right pr-4">Status & Control</th>
         </tr>
         </thead>
         <tbody class="text-sm">
@@ -39,33 +39,39 @@
                 </td>
 
                 <td class="py-6 text-right pr-4">
-                    <form action="/admin/lans/status" method="POST" class="inline-block relative">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="id" value="<?= $lan['id'] ?>">
+                    <div class="flex flex-col items-end space-y-4">
+                        <form action="/admin/lans/status" method="POST" class="inline-block relative">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="id" value="<?= $lan['id'] ?>">
 
-                        <?php
-                        $borderColor = match($lan['status']) {
-                            'proposed' => 'border-yellow-500/50 text-yellow-500',
-                            'approved' => 'border-cyber-cyan text-cyber-cyan',
-                            'declined' => 'border-red-500 text-red-500',
-                            default    => 'border-white/20 text-white'
-                        };
-                        ?>
+                            <?php
+                            $borderColor = match($lan['status']) {
+                                'proposed' => 'border-yellow-500/50 text-yellow-500',
+                                'approved' => 'border-cyber-cyan text-cyber-cyan',
+                                'declined' => 'border-red-500 text-red-500',
+                                default    => 'border-white/20 text-white'
+                            };
+                            ?>
 
-                        <div class="relative group/select">
-                            <select name="status" onchange="this.form.submit()"
-                                    class="appearance-none bg-black/60 border-2 <?= $borderColor ?> font-orbitron text-[10px] font-bold py-2 pl-4 pr-10 cursor-pointer focus:outline-none focus:ring-1 focus:ring-white transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(0,0,0,0.5)]">
-                                <option value="proposed" <?= $lan['status'] === 'proposed' ? 'selected' : '' ?>>🟡 Proposed</option>
-                                <option value="approved" <?= $lan['status'] === 'approved' ? 'selected' : '' ?>>🔵 Approved</option>
-                                <option value="declined" <?= $lan['status'] === 'declined' ? 'selected' : '' ?>>🔴 Declined</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 <?= $borderColor ?>">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                                </svg>
+                            <div class="relative group/select">
+                                <select name="status" onchange="this.form.submit()"
+                                        class="appearance-none bg-black/60 border-2 <?= $borderColor ?> font-orbitron text-[10px] font-bold py-2 pl-4 pr-10 cursor-pointer focus:outline-none focus:ring-1 focus:ring-white transition-all uppercase tracking-widest shadow-[0_0_10px_rgba(0,0,0,0.5)]">
+                                    <option value="proposed" <?= $lan['status'] === 'proposed' ? 'selected' : '' ?>>🟡 Proposed</option>
+                                    <option value="approved" <?= $lan['status'] === 'approved' ? 'selected' : '' ?>>🔵 Approved</option>
+                                    <option value="declined" <?= $lan['status'] === 'declined' ? 'selected' : '' ?>>🔴 Declined</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 <?= $borderColor ?>">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                    </svg>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+
+                        <a href="/admin/lans/edit?id=<?= $lan['id'] ?>" class="flex items-center px-4 py-2 bg-cyber-purple/10 border border-cyber-purple/50 text-cyber-purple hover:bg-cyber-purple hover:text-white text-[10px] font-bold uppercase tracking-widest transition-all group/edit">
+                            <span class="mr-2 group-hover/edit:animate-pulse">✏️</span> Edit Operation
+                        </a>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>
