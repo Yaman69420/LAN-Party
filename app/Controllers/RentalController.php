@@ -3,13 +3,19 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Repositories\ItemRepository;
+
 class RentalController
 {
+    private ItemRepository $itemRepo;
+
     public function __construct() {
-        requireLogin(); // Alleen ingelogde gebruikers mogen resources zien
+        requireLogin();
+        $this->itemRepo = new ItemRepository();
     }
 
     public function index(): void {
-        view('resources/index');
+        $items = $this->itemRepo->getAll();
+        view('resources/index', ['items' => $items]);
     }
 }
