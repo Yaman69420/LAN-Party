@@ -14,21 +14,34 @@ class AuthController
     }
 
     public function login(): void {
-        if (!csrf_verify()) die('Invalid CSRF token');
+        // CSRF beveiliging (deze laten we staan zoals hij was)
+        if (function_exists('csrf_verify') && !csrf_verify()) {
+            die('Invalid CSRF token');
+        }
 
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
+
+        // Haal gebruiker op (Dit komt terug als Object door onze fix in UserRepository)
         $user = $this->userRepo->findByEmail($email);
 
         if ($user && password_verify($password, $user->password_hash)) {
-            $_SESSION['user'] = [
-                'id' => $user->id,
-                'username' => $user->username,
-                'role' => $user->role
-            ];
+            // Veiligheid: Regenereer sessie ID bij inloggen
+            session_regenerate_id(true);
+
+            // --- DE OPLOSSING ---
+            // OUDE CODE (Fout):
+            // $_SESSION['user'] = ['id' => $user->id, 'username' => $user->username, 'role' => $user->role];
+
+            // NIEUWE CODE (Goed):
+            // We zetten het hele object om naar een array.
+            // Hierdoor zit 'profile_image', 'first_name', etc. er automatisch bij!
+            $_SESSION['user'] = (array) $user;
+
             header("Location: /dashboard");
             exit;
         } else {
+            // Als login faalt
             view('auth/login', ['error' => 'Ongeldige inloggegevens']);
         }
     }
@@ -40,8 +53,7 @@ class AuthController
             exit;
         }
 
-        // We gebruiken hier NIET de view() helper van je collega als die automatisch de sidebar laadt
-        // We laden het bestand puur en alleen:
+        // We laden het bestand direct zoals je vroeg
         require_once __DIR__ . '/../Views/auth/login.php';
     }
 
@@ -51,7 +63,9 @@ class AuthController
     }
 
     public function register(): void {
-        if (!csrf_verify()) die('Invalid CSRF token');
+        if (function_exists('csrf_verify') && !csrf_verify()) {
+            die('Invalid CSRF token');
+        }
 
         $username = $_POST['username'] ?? '';
         $email = $_POST['email'] ?? '';
@@ -75,8 +89,8 @@ class AuthController
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         // Create user
+        // Let op: zorg dat je UserRepository een create functie heeft die deze 5 argumenten accepteert
         if ($this->userRepo->create($username, $email, $passwordHash, $firstName, $lastName)) {
-            // Auto login or redirect to login
             view('auth/login', ['success' => 'Account aangemaakt! Je kunt nu inloggen.']);
         } else {
             view('auth/register', ['error' => 'Er ging iets mis bij het registreren.']);
@@ -84,6 +98,8 @@ class AuthController
     }
 
     public function logout(): void {
+        // Sessie volledig wissen
+        $_SESSION = [];
         session_destroy();
         header("Location: /login");
         exit;

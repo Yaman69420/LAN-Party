@@ -21,6 +21,8 @@ $router->get('/user/profile', 'ProfileController', 'viewUser');
 $router->get('/user/search', 'ProfileController', 'search');
 $router->post('/user/add-friend', 'ProfileController', 'addFriend');
 $router->post('/user/accept-friend', 'ProfileController', 'acceptFriend');
+$router->get('/profile/edit', 'ProfileController', 'edit');
+$router->post('/profile/update', 'ProfileController', 'update');
 
 // --- 3. Gebruiker Dashboard ---
 $router->get('/dashboard', 'UserDashboardController', 'index');
