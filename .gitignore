@@ -12,5 +12,8 @@ app/Config/database.php
 # Logs
 *.log
 
+#env
+.env
+
 # SQL dumps (optioneel in git)
 # *.sql
