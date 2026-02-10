@@ -242,8 +242,10 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
                 </thead>
                 <tbody class="divide-y divide-white/5">
                 <?php if (!empty($rentals)): ?>
-                    <?php foreach ($rentals as $rental): ?>
-                        <tr class="hover:bg-white/5 transition-colors">
+                <?php foreach ($rentals as $rental): 
+                    $rental = (array)$rental;
+                ?>
+                    <tr class="hover:bg-white/5 transition-colors">
                             <td class="p-4 text-sm text-white font-bold"><?= htmlspecialchars($rental['item_name'] ?? 'Unknown') ?></td>
                             <td class="p-4 text-xs text-cyber-cyan font-mono"><?= htmlspecialchars($rental['category'] ?? '-') ?></td>
                             <td class="p-4 text-xs text-white font-mono font-bold">
