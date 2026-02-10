@@ -17,30 +17,33 @@ class LanPartyRepository {
      * Haalt alle LAN-party's op met hun bijbehorende reservaties
      */
     public function getAllPartiesWithReservations(): array {
-        // Expliciete selectie van kolommen voor veiligheid en performance
+        // We voegen 'WHERE lp.status = 'approved'' toe
         $sql = "SELECT 
-                    lp.id, 
-                    lp.name, 
-                    lp.start_date, 
-                    i.name AS item_name, 
-                    t.quantity 
-                FROM lan_parties AS lp
-                LEFT JOIN rentals AS t ON lp.id = t.lan_party_id
-                LEFT JOIN items AS i ON t.item_id = i.id
-                ORDER BY lp.start_date ASC";
+                lp.id, 
+                lp.name, 
+                lp.start_date, 
+                lp.description,
+                lp.status,
+                i.name AS item_name, 
+                r.quantity 
+            FROM lan_parties AS lp
+            LEFT JOIN rentals AS r ON lp.id = r.lan_party_id
+            LEFT JOIN items AS i ON r.item_id = i.id
+            WHERE lp.status = 'approved'
+            ORDER BY lp.start_date ASC";
 
         $stmt = $this->db->query($sql);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Herstructureren naar een datum-index voor de kalender
         $parties = [];
         foreach ($results as $row) {
-            $date = $row['start_date'];
+            $date = date('Y-m-d', strtotime($row['start_date']));
 
             if (!isset($parties[$date])) {
                 $parties[$date] = [
                     'id'       => $row['id'],
                     'title'    => $row['name'],
+                    'location' => $row['description'],
                     'items'    => []
                 ];
             }
@@ -53,5 +56,26 @@ class LanPartyRepository {
             }
         }
         return $parties;
+    }
+
+    /**
+     * Slaat een nieuwe LAN-party aanvraag op in de database
+     */
+    public function create(string $name, string $description, int $attendees, string $email, string $start, string $end, int $organizerId): bool
+    {
+        $sql = "INSERT INTO lan_parties (name, description, expected_attendees, contact_email, start_date, end_date, status, organizer_id, created_at) 
+            VALUES (:name, :description, :attendees, :email, :start_date, :end_date, 'proposed', :organizer_id, NOW())";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            'name'        => $name,
+            'description' => $description,
+            'attendees'   => $attendees,
+            'email'       => $email,
+            'start_date'  => $start,
+            'end_date'    => $end,
+            'organizer_id'=> $organizerId
+        ]);
     }
 }

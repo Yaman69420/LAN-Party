@@ -22,7 +22,10 @@ $router->get('/dashboard', 'UserDashboardController', 'index');
 
 // --- 4. Overige Gebruiker Pagina's ---
 $router->get('/resources', 'RentalController', 'index');
-$router->get('/propose', 'HomeController', 'propose');
+
+// --- Propose LAN Routes ---
+$router->get('/propose', 'ProposeController', 'index');  // Formulier tonen
+$router->post('/propose', 'ProposeController', 'store'); // Formulier verwerken
 
 // --- 5. Admin Sectie (Collega) ---
 $router->get('/admin', 'AdminController', 'index');
