@@ -11,14 +11,13 @@ class UserRepository
 {
     private PDO $db;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
 
     public function findByEmail(string $email): ?User
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
         
         $stmt->setFetchMode(PDO::FETCH_CLASS, User::class);
@@ -27,17 +26,19 @@ class UserRepository
         return $user ?: null;
     }
 
-    public function create(string $username, string $email, string $passwordhash): bool
+    public function create(string $username, string $email, string $passwordhash, string $firstName = '', string $lastName = ''): bool
     {
         $stmt = $this->db->prepare("
-            INSERT INTO users (username, email, password) 
-            VALUES (:username, :email, :password)
+            INSERT INTO users (username, email, password_hash, first_name, last_name, role, is_active) 
+            VALUES (:username, :email, :password_hash, :first_name, :last_name, 'user', 1)
         ");
         
         return $stmt->execute([
             'username' => $username,
             'email' => $email,
-            'password' => $passwordhash
+            'password_hash' => $passwordhash,
+            'first_name' => $firstName,
+            'last_name' => $lastName
         ]);
     }
 }
