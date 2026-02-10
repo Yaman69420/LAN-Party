@@ -178,4 +178,19 @@ class UserRepository
             'last_name' => $lastName
         ]);
     }
+
+    // Haalt 3 specifieke items op voor de 'The Armory' sidebar
+    public function getFeaturedResources(): array {
+        $sql = "SELECT * FROM items ORDER BY id ASC LIMIT 3";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Haalt alle parties op voor de kalender
+    public function getAllParties(): array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties ORDER BY start_date ASC");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
