@@ -28,3 +28,11 @@ $router->get('/propose', 'HomeController', 'propose');
 $router->get('/admin', 'AdminController', 'index');
 $router->get('/admin/users', 'AdminController', 'users');
 $router->get('/admin/approvals', 'AdminController', 'approvals');
+
+// Admin Resources
+$router->get('/admin/resources', 'AdminController', 'resources');
+$router->get('/admin/resources/create', 'AdminController', 'resourceCreate');
+$router->post('/admin/resources/create', 'AdminController', 'resourceStore');
+$router->get('/admin/resources/edit', 'AdminController', 'resourceEdit'); // verwacht ?id=...
+$router->post('/admin/resources/edit', 'AdminController', 'resourceUpdate');
+$router->post('/admin/resources/delete', 'AdminController', 'resourceDelete');
