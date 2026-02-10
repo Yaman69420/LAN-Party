@@ -10,4 +10,5 @@ class Item
     public string $category;
     public int $total_stock;
     public string $created_at;
+    public ?string $deleted_at = null;
 }

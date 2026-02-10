@@ -8,14 +8,15 @@ use App\Repositories\LanPartyRepository;
 class UserDashboardController
 {
     private LanPartyRepository $lanPartyRepo;
+    private \App\Repositories\RentalRepository $rentalRepo;
 
     public function __construct() {
         $this->lanPartyRepo = new LanPartyRepository();
+        $this->rentalRepo = new \App\Repositories\RentalRepository();
     }
 
     public function index(): void
     {
-        // STAP A: Start de sessie handmatig (soms vergeet de core dit)
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -23,10 +24,12 @@ class UserDashboardController
         requireLogin();
 
         $parties = $this->lanPartyRepo->getAllPartiesWithReservations();
+        $rentals = $this->rentalRepo->getByUser($_SESSION['user']['id']);
 
         view('user/dashboard', [
             'username' => $_SESSION['user']['username'] ?? 'Gast-Gebruiker',
-            'parties'  => $parties
+            'parties'  => $parties,
+            'rentals'  => $rentals
         ]);
     }
 }

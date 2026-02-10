@@ -16,12 +16,13 @@ class ItemRepository
     }
 
     public function getAll(): array {
-        $stmt = $this->db->query("SELECT * FROM items");
+        // Soft delete: alleen items ophalen die NIET verwijderd zijn
+        $stmt = $this->db->query("SELECT * FROM items WHERE deleted_at IS NULL");
         return $stmt->fetchAll(PDO::FETCH_CLASS, Item::class);
     }
 
     public function find(int $id): ?Item {
-        $stmt = $this->db->prepare("SELECT * FROM items WHERE id = :id LIMIT 1");
+        $stmt = $this->db->prepare("SELECT * FROM items WHERE id = :id AND deleted_at IS NULL LIMIT 1");
         $stmt->execute(['id' => $id]);
         $stmt->setFetchMode(PDO::FETCH_CLASS, Item::class);
         $item = $stmt->fetch();
@@ -38,8 +39,15 @@ class ItemRepository
         return $stmt->execute(['id' => $id, 'name' => $name, 'category' => $category, 'total_stock' => $totalStock]);
     }
 
+    // Hard delete (definitief verwijderen)
     public function delete(int $id): bool {
         $stmt = $this->db->prepare("DELETE FROM items WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
+    }
+
+    // Soft delete (markeren als verwijderd)
+    public function softDelete(int $id): bool {
+        $stmt = $this->db->prepare("UPDATE items SET deleted_at = NOW() WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
 }

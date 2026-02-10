@@ -1,4 +1,50 @@
-<div class="mt-4" x-data="{ search: '', category: 'all' }">
+<div class="mt-4" x-data="{ search: '', category: 'all', showModal: false, selectedItem: null }">
+    <!-- Reservation Modal -->
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showModal = false"></div>
+        <div class="relative bg-[#0b0c10] border border-white/10 p-8 rounded-sm max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
+            
+            <!-- Tech Corners -->
+            <div class="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyber-cyan"></div>
+            <div class="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyber-cyan"></div>
+            <div class="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyber-cyan"></div>
+            <div class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyber-cyan"></div>
+
+            <h3 class="text-xl font-orbitron text-white mb-6 uppercase tracking-wider text-center">
+                <span class="text-cyber-cyan">Requisition</span> Protocol
+            </h3>
+
+            <p class="text-gray-400 mb-8 font-mono text-xs text-center">
+                You are about to requisition item:<br>
+                <span class="text-white font-bold text-sm mt-1 block" x-text="selectedItem?.name"></span>
+            </p>
+            
+            <form action="/rentals/store" method="POST" class="space-y-6">
+                <?= csrf_field() ?>
+                <input type="hidden" name="item_id" :value="selectedItem?.id">
+                
+                <div>
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Target Date & Time</label>
+                    <input type="datetime-local" name="reservation_date" required 
+                           class="w-full bg-[#1a1c23] border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all font-mono text-sm [color-scheme:dark] uppercase">
+                </div>
+
+                <div class="pt-2 space-y-3">
+                    <button type="submit"
+                            class="w-full group relative px-6 py-4 bg-cyber-cyan/10 border border-cyber-cyan hover:bg-cyber-cyan/20 transition-all duration-300 overflow-hidden">
+                        <div class="absolute inset-0 w-0 bg-cyber-cyan transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                        <span class="relative text-cyber-cyan font-orbitron uppercase tracking-[0.2em] group-hover:text-white transition-colors font-bold text-xs">
+                            Initialize Requisition
+                        </span>
+                    </button>
+                    
+                    <button type="button" @click="showModal = false" class="w-full text-[10px] text-white/30 hover:text-red-400 uppercase tracking-widest transition-colors py-2">
+                        [ Abort Sequence ]
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="mb-6 flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
             <div class="flex items-center space-x-2 text-cyber-cyan mb-2">
@@ -81,7 +127,10 @@
                                     STOCK: <span class="text-white/80"><?= $item->total_stock ?></span> UNITS
                                 </div>
                                 
-                                <button class="bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black px-4 py-2 text-[10px] font-bold uppercase tracking-[0.15em] transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] hover:shadow-[0_0_20px_rgba(0,242,255,0.4)]">
+                                <button 
+                                    @click="selectedItem = { id: <?= $item->id ?>, name: '<?= e($item->name) ?>' }; showModal = true"
+                                    class="bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan hover:text-black px-4 py-2 text-[10px] font-bold uppercase tracking-[0.15em] transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] hover:shadow-[0_0_20px_rgba(0,242,255,0.4)]"
+                                >
                                     RESERVEREN
                                 </button>
                             </div>
