@@ -1,3 +1,17 @@
+<?php
+// DE FIX: Zet objecten om naar arrays zodat $user['key'] altijd werkt
+if (isset($user) && is_object($user)) {
+    $user = (array) $user;
+}
+
+// Kleine helper voor veiligheid, mocht je functie e() nog niet hebben
+if (!function_exists('e')) {
+    function e($string) {
+        return htmlspecialchars((string)$string, ENT_QUOTES, 'UTF-8');
+    }
+}
+?>
+
 <?php if ($isOwnProfile && !empty($pendingRequests)): ?>
     <div class="mb-8 bg-cyber-purple/10 border border-cyber-purple p-4 rounded-sm shadow-[0_0_15px_rgba(188,19,254,0.1)]">
         <h3 class="text-cyber-purple font-orbitron text-xs font-black tracking-widest uppercase mb-4 italic">
@@ -28,13 +42,30 @@
 
     <div class="bg-cyber-dark/60 p-6 rounded-sm border border-white/5 shadow-2xl h-fit">
         <div class="flex flex-col items-center text-center">
-            <div class="w-24 h-24 rounded border border-cyber-cyan p-1 shadow-[0_0_15px_rgba(0,242,255,0.2)] mb-4">
-                <img src="https://ui-avatars.com/api/?name=<?= urlencode($user['username']) ?>&background=0b0c10&color=00f2ff&bold=true" class="rounded w-full h-full object-cover" alt="Avatar">
+            
+            <div class="w-24 h-24 rounded border border-cyber-cyan p-1 shadow-[0_0_15px_rgba(0,242,255,0.2)] mb-4 overflow-hidden">
+                <?php
+                $imageName = $user['profile_image'] ?? '';
+                $profileSrc = (!empty($imageName) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $imageName))
+                        ? '/uploads/avatars/' . rawurlencode($imageName)
+                        : 'https://ui-avatars.com/api/?name=' . urlencode($user['username']) . '&background=0b0c10&color=00f2ff&bold=true';
+                ?>
+                <img src="<?= $profileSrc ?>" class="rounded w-full h-full object-cover" alt="Avatar">
             </div>
+
             <h2 class="font-orbitron text-xl text-white tracking-widest uppercase italic"><?= e($user['username']) ?></h2>
+            
             <p class="text-[10px] text-cyber-cyan font-bold tracking-[0.3em] uppercase mt-2 opacity-80">
                 Status: <?= $isOwnProfile ? 'COMMANDER' : 'OPERATIVE' ?>
             </p>
+
+            <?php if ($isOwnProfile): ?>
+                <div class="mt-6 w-full px-4">
+                    <a href="/profile/edit" class="block w-full py-2 border border-cyber-cyan text-cyber-cyan text-[10px] font-black uppercase tracking-[0.2em] hover:bg-cyber-cyan hover:text-black transition-all shadow-[0_0_10px_rgba(0,242,255,0.2)]">
+                        ⚙️ Edit Identity
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <?php if (!$isOwnProfile && !$friendshipStatus): ?>
                 <form action="/user/add-friend" method="POST" class="mt-4 w-full">
@@ -59,8 +90,13 @@
                         <p class="col-span-4 text-[10px] text-white/20 italic">No squad members found.</p>
                     <?php else: ?>
                         <?php foreach($friends as $friend): ?>
-                            <a href="/user/profile/<?= e($friend['slug']) ?>" title="<?= e($friend['username']) ?>">
-                                <img src="https://ui-avatars.com/api/?name=<?= urlencode($friend['username']) ?>&background=12141a&color=bc13fe" class="w-10 h-10 border border-white/10 hover:border-cyber-purple transition-all" alt="Friend">
+                            <a href="/user/profile/<?= e($friend['slug'] ?? $friend['username']) ?>" title="<?= e($friend['username']) ?>">
+                                <?php
+                                $friendImg = (!empty($friend['profile_image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/' . $friend['profile_image']))
+                                        ? '/uploads/avatars/' . rawurlencode($friend['profile_image'])
+                                        : 'https://ui-avatars.com/api/?name=' . urlencode($friend['username']) . '&background=12141a&color=bc13fe';
+                                ?>
+                                <img src="<?= $friendImg ?>" class="w-10 h-10 border border-white/10 hover:border-cyber-purple transition-all object-cover" alt="Friend">
                             </a>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -81,7 +117,7 @@
             </h3>
 
             <div class="space-y-4">
-                <?php if(!$isOwnProfile && $friendshipStatus !== 'accepted'): ?>
+                <?php if(!$isOwnProfile && ($friendshipStatus ?? '') !== 'accepted'): ?>
                     <p class="text-xs text-white/20 italic uppercase tracking-widest text-center py-4 border border-white/5">Intel classified. Become friends to view missions.</p>
                 <?php elseif(empty($upcoming)): ?>
                     <p class="text-xs text-white/20 uppercase tracking-widest text-center py-4 border border-white/5">No active deployments found</p>
@@ -99,7 +135,7 @@
             </div>
         </div>
 
-        <?php if($isOwnProfile || $friendshipStatus === 'accepted'): ?>
+        <?php if($isOwnProfile || ($friendshipStatus ?? '') === 'accepted'): ?>
             <div class="bg-cyber-dark/40 p-8 rounded-sm border border-white/5 opacity-70">
                 <h3 class="font-orbitron text-white/50 text-md tracking-widest uppercase italic mb-6">Archived Logs</h3>
                 <div class="space-y-2">
