@@ -83,6 +83,11 @@ $isLoggedIn = ($user !== null);
                 <span class="font-medium tracking-wider uppercase text-sm">Propose LAN</span>
             </a>
 
+            <a href="/profile" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-cyan hover:bg-cyber-cyan/5 border-l-4 border-transparent hover:border-cyber-cyan transition-all duration-300">
+                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-cyan group-hover:opacity-100 transition-opacity">👤</span>
+                <span class="font-medium tracking-wider uppercase text-sm group-hover:neon-text-cyan">My Profile</span>
+            </a>
+
             <?php if ($role === 'admin'): ?>
                 <div class="mt-8 pt-4 border-t border-white/5 mx-4">
                     <p class="px-4 text-[10px] text-cyber-purple uppercase tracking-[0.2em] font-bold mb-2">Command Center</p>

@@ -13,6 +13,21 @@ class LanPartyRepository {
         $this->db = Database::getInstance()->getConnection();
     }
 
+    public function getUpcomingForUser(int $userId): array {
+        $sql = "SELECT DISTINCT lp.* FROM lan_parties lp JOIN rentals r ON lp.id = r.lan_party_id
+                WHERE r.user_id = :uid AND lp.start_date >= CURDATE() AND lp.status = 'approved' ORDER BY lp.start_date ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['uid' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getHistoryForUser(int $userId): array {
+        $sql = "SELECT DISTINCT lp.* FROM lan_parties lp JOIN rentals r ON lp.id = r.lan_party_id
+                WHERE r.user_id = :uid AND lp.start_date < CURDATE() AND lp.status = 'approved' ORDER BY lp.start_date DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['uid' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     /**
      * Haalt alle LAN-party's op met hun bijbehorende reservaties
      */

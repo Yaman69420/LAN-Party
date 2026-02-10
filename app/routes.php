@@ -15,6 +15,13 @@ $router->get('/register', 'AuthController', 'showRegister');
 $router->post('/register', 'AuthController', 'register');
 $router->get('/logout', 'AuthController', 'logout');
 
+// Profile & Social
+$router->get('/profile', 'ProfileController', 'index');
+$router->get('/user/profile', 'ProfileController', 'viewUser');
+$router->get('/user/search', 'ProfileController', 'search');
+$router->post('/user/add-friend', 'ProfileController', 'addFriend');
+$router->post('/user/accept-friend', 'ProfileController', 'acceptFriend');
+
 // --- 3. Gebruiker Dashboard ---
 $router->get('/dashboard', 'UserDashboardController', 'index');
 
