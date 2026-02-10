@@ -35,6 +35,10 @@ $router->post('/propose', 'ProposeController', 'store');
 $router->get('/admin', 'AdminController', 'index');
 $router->get('/admin/users', 'AdminController', 'users');
 
+$router->get('/admin/users/edit', 'AdminController', 'userEdit');
+$router->post('/admin/users/edit', 'AdminController', 'userUpdate');
+$router->post('/admin/users/toggle', 'AdminController', 'toggleUserStatus');
+
 // DEZE MOET HIER STAAN:
 $router->get('/admin/lans', 'AdminController', 'lans');
 $router->post('/admin/lans/status', 'AdminController', 'updateLanStatus');

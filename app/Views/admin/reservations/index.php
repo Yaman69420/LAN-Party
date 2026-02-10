@@ -3,6 +3,10 @@
 <?php if (empty($rentals)): ?>
     <p>Geen openstaande aanvragen.</p>
 <?php else: ?>
+    <a href="/admin" class="inline-block mb-6 text-[10px] font-orbitron text-cyber-cyan/50 hover:text-cyber-cyan transition-all uppercase tracking-[0.3em]">
+        <span class="mr-2">«</span> Back to Command Center
+    </a>
+
     <table border="1" cellpadding="10">
         <thead>
             <tr>

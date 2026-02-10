@@ -15,6 +15,36 @@ class UserRepository
         $this->db = Database::getInstance()->getConnection();
     }
 
+    /**
+     * Haal alle gebruikers op voor de admin
+     */
+    public function getAllUsers(): array {
+        $stmt = $this->db->query("SELECT id, username, email, role, is_active FROM users ORDER BY id DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Wissel de status tussen actief (1) en geblokkeerd (0)
+     */
+    public function toggleUserStatus(int $id, int $currentStatus): bool {
+        $newStatus = ($currentStatus === 1) ? 0 : 1;
+        $stmt = $this->db->prepare("UPDATE users SET is_active = :status WHERE id = :id");
+        return $stmt->execute(['status' => $newStatus, 'id' => $id]);
+    }
+
+    /**
+     * Update gebruiker gegevens (voor de Edit functie)
+     */
+    public function update(int $id, array $data): bool {
+        $stmt = $this->db->prepare("UPDATE users SET username = :username, email = :email, role = :role WHERE id = :id");
+        return $stmt->execute([
+            'username' => $data['username'],
+            'email'    => $data['email'],
+            'role'     => $data['role'],
+            'id'       => $id
+        ]);
+    }
+
     public function findByEmail(string $email): ?User {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
