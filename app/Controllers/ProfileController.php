@@ -39,18 +39,35 @@ class ProfileController
         view('user/search', ['results' => $results, 'query' => $query]);
     }
 
-    public function viewUser(): void {
-        $targetId = (int)($_GET['id'] ?? 0);
+    public function viewUser(?string $slug = null): void {
+        $targetId = 0;
+        $user = null;
+
+        // 1. Zoek op basis van slug (nieuwe manier)
+        if ($slug) {
+            $user = $this->userRepo->findBySlug($slug);
+        } 
+        // 2. Fallback: Zoek op basis van ID (oude manier, via $_GET)
+        elseif (isset($_GET['id'])) {
+            $user = $this->userRepo->findById((int)$_GET['id']);
+        }
+
+        // 3. Validatie
+        if (!$user) { 
+            header('Location: /dashboard'); 
+            exit; 
+        }
+
+        // Zorg dat user altijd een array is voor consistentie
+        $user = (array)$user;
+        $targetId = (int)$user['id'];
         $myId = (int)$_SESSION['user']['id'];
 
         if ($targetId === $myId) { header('Location: /profile'); exit; }
 
-        $user = $this->userRepo->findById($targetId);
-        if (!$user) { header('Location: /dashboard'); exit; }
-
         $status = $this->userRepo->getFriendshipStatus($myId, $targetId);
         view('user/profile', [
-            'user' => $user,
+            'user' => (array)$user, // Zeker weten dat het een array is voor de view
             'friendshipStatus' => $status,
             'isOwnProfile' => false,
             'friends' => $this->userRepo->getFriends($targetId),
@@ -60,6 +77,7 @@ class ProfileController
     }
 
     public function addFriend(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
         $friendId = (int)($_POST['friend_id'] ?? 0);
         if ($friendId > 0) { $this->userRepo->sendFriendRequest((int)$_SESSION['user']['id'], $friendId); }
         header('Location: /user/profile?id=' . $friendId);
@@ -71,7 +89,7 @@ class ProfileController
 
         $requestId = (int)($_POST['request_id'] ?? 0);
         if ($requestId > 0) {
-            $this->userRepo->acceptFriendRequest($requestId);
+            $this->userRepo->acceptFriendRequest($requestId, (int)$_SESSION['user']['id']);
         }
 
         header('Location: /profile');

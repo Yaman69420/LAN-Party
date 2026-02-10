@@ -24,7 +24,7 @@
                 <td class="p-3"><?= e($item->category ?? '-') ?></td>
                 <td class="p-3 text-center"><?= $item->total_stock ?></td>
                 <td class="p-3 text-right space-x-2">
-                    <a href="/admin/resources/edit?id=<?= $item->id ?>" class="text-cyber-cyan hover:underline">Bewerk</a>
+                    <a href="/admin/resources/edit/<?= e($item->slug) ?>" class="text-cyber-cyan hover:underline">Bewerk</a>
                     <form action="/admin/resources/delete" method="POST" class="inline" onsubmit="return confirm('Weet je het zeker?');">
                         <?= csrf_field() ?>
                         <input type="hidden" name="id" value="<?= $item->id ?>">

@@ -15,6 +15,14 @@ class UserRepository
         $this->db = Database::getInstance()->getConnection();
     }
 
+    public function findBySlug(string $slug): ?User {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE slug = :slug LIMIT 1");
+        $stmt->execute(['slug' => $slug]);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, User::class);
+        $user = $stmt->fetch();
+        return $user ?: null;
+    }
+
     public function findByEmail(string $email): ?User {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
@@ -30,13 +38,13 @@ class UserRepository
     }
 
     public function searchUsers(string $query, int $excludeId): array {
-        $stmt = $this->db->prepare("SELECT id, username FROM users WHERE username LIKE :q AND id != :excl LIMIT 10");
+        $stmt = $this->db->prepare("SELECT id, username, slug FROM users WHERE username LIKE :q AND id != :excl LIMIT 10");
         $stmt->execute(['q' => "%$query%", 'excl' => $excludeId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getFriends(int $userId): array {
-        $sql = "SELECT u.id, u.username FROM users u
+        $sql = "SELECT u.id, u.username, u.slug FROM users u
             JOIN friends f ON (u.id = f.friend_id OR u.id = f.user_id)
             WHERE (f.user_id = :uid1 OR f.friend_id = :uid2)
             AND u.id != :uid3 AND f.status = 'accepted'";
@@ -89,19 +97,30 @@ class UserRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function acceptFriendRequest(int $requestId): bool {
-        $sql = "UPDATE friends SET status = 'accepted' WHERE id = :id";
-        return $this->db->prepare($sql)->execute(['id' => $requestId]);
+    public function acceptFriendRequest(int $requestId, int $userId): bool {
+        $sql = "UPDATE friends SET status = 'accepted' WHERE id = :id AND friend_id = :uid";
+        return $this->db->prepare($sql)->execute(['id' => $requestId, 'uid' => $userId]);
     }
 
     public function create(string $username, string $email, string $passwordhash, string $firstName = '', string $lastName = ''): bool {
+        // Slug generatie
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $username), '-'));
+        // Uniek maken indien nodig (simpele check, in productie robuuster)
+        if ($this->findBySlug($slug)) {
+            $slug .= '-' . time();
+        }
+
         $stmt = $this->db->prepare("
-            INSERT INTO users (username, email, password_hash, first_name, last_name, role, is_active) 
-            VALUES (:username, :email, :password_hash, :first_name, :last_name, 'user', 1)
+            INSERT INTO users (username, slug, email, password_hash, first_name, last_name, role, is_active) 
+            VALUES (:username, :slug, :email, :password_hash, :first_name, :last_name, 'user', 1)
         ");
         return $stmt->execute([
-            'username' => $username, 'email' => $email, 'password_hash' => $passwordhash,
-            'first_name' => $firstName, 'last_name' => $lastName
+            'username' => $username, 
+            'slug' => $slug,
+            'email' => $email, 
+            'password_hash' => $passwordhash,
+            'first_name' => $firstName, 
+            'last_name' => $lastName
         ]);
     }
 }

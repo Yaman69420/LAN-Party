@@ -2,7 +2,7 @@
     <h2 class="font-orbitron text-white text-xl tracking-widest uppercase mb-6 italic">Find Operatives</h2>
 
     <form action="/user/search" method="GET" class="mb-10 flex space-x-4">
-        <input type="text" name="q" value="<?= htmlspecialchars($query ?? '') ?>"
+        <input type="text" name="q" value="<?= e($query ?? '') ?>"
                placeholder="Enter username..."
                class="flex-1 bg-black/40 border border-white/10 px-4 py-2 text-white font-rajdhani focus:border-cyber-cyan outline-none transition-all">
         <button type="submit" class="bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan px-6 py-2 uppercase font-bold text-xs hover:bg-cyber-cyan hover:text-black transition-all">
@@ -20,9 +20,9 @@
                         <div class="w-10 h-10 border border-cyber-cyan/30 p-0.5">
                             <img src="https://ui-avatars.com/api/?name=<?= urlencode($row['username']) ?>&background=0b0c10&color=00f2ff" alt="Avatar">
                         </div>
-                        <span class="text-white font-bold tracking-wide"><?= htmlspecialchars($row['username']) ?></span>
+                        <span class="text-white font-bold tracking-wide"><?= e($row['username']) ?></span>
                     </div>
-                    <a href="/user/profile?id=<?= $row['id'] ?>" class="text-[10px] text-cyber-purple border border-cyber-purple/30 px-3 py-1 hover:bg-cyber-purple hover:text-white transition-all uppercase font-black">
+                    <a href="/user/profile/<?= e($row['slug']) ?>" class="text-[10px] text-cyber-purple border border-cyber-purple/30 px-3 py-1 hover:bg-cyber-purple hover:text-white transition-all uppercase font-black">
                         View Intel
                     </a>
                 </div>

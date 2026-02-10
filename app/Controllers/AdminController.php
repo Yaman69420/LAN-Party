@@ -58,8 +58,15 @@ class AdminController
         $this->itemRepo->create($_POST['name'] ?? '', $_POST['category'] ?? '', (int)$_POST['total_stock']);
         header('Location: /admin/resources'); exit;
     }
-    public function resourceEdit(): void {
-        $item = $this->itemRepo->find((int)$_GET['id']);
+    public function resourceEdit(?string $slug = null): void {
+        if (!$slug && isset($_GET['id'])) {
+            $item = $this->itemRepo->find((int)$_GET['id']);
+        } elseif ($slug) {
+            $item = $this->itemRepo->findBySlug($slug);
+        } else {
+            $item = null;
+        }
+
         if(!$item) { header('Location: /admin/resources'); exit; }
         view('admin/resources/edit', ['item' => $item]);
     }

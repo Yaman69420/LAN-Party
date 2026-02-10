@@ -13,6 +13,7 @@ class User
     public string $password_hash; // Changed from 'password' to match DB column
     public string $role;
     public int $is_active; // Changed to int to match TINYINT(1) DB return
+    public ?string $slug = null;
     public string $created_at;
 
     // Helper to get full name

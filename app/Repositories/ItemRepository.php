@@ -17,7 +17,8 @@ class ItemRepository
 
     public function getAll(): array {
         // Soft delete: alleen items ophalen die NIET verwijderd zijn
-        $stmt = $this->db->query("SELECT * FROM items WHERE deleted_at IS NULL");
+        $stmt = $this->db->prepare("SELECT * FROM items WHERE deleted_at IS NULL");
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_CLASS, Item::class);
     }
 
@@ -29,9 +30,24 @@ class ItemRepository
         return $item ?: null;
     }
 
+    public function findBySlug(string $slug): ?Item {
+        $stmt = $this->db->prepare("SELECT * FROM items WHERE slug = :slug AND deleted_at IS NULL LIMIT 1");
+        $stmt->execute(['slug' => $slug]);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Item::class);
+        $item = $stmt->fetch();
+        return $item ?: null;
+    }
+
     public function create(string $name, string $category, int $totalStock): bool {
-        $stmt = $this->db->prepare("INSERT INTO items (name, category, total_stock) VALUES (:name, :category, :total_stock)");
-        return $stmt->execute(['name' => $name, 'category' => $category, 'total_stock' => $totalStock]);
+        // Slug generatie
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name), '-'));
+        // Uniek maken indien nodig
+        if ($this->findBySlug($slug)) {
+            $slug .= '-' . time();
+        }
+
+        $stmt = $this->db->prepare("INSERT INTO items (name, slug, category, total_stock) VALUES (:name, :slug, :category, :total_stock)");
+        return $stmt->execute(['name' => $name, 'slug' => $slug, 'category' => $category, 'total_stock' => $totalStock]);
     }
 
     public function update(int $id, string $name, string $category, int $totalStock): bool {
