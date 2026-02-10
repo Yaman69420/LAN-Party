@@ -50,18 +50,18 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Verwachte Eenheden (Personen)</label>
-                    <input type="number" name="attendees" min="2" max="100" required placeholder="bv. 15"
-                           class="w-full bg-cyber-dark border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all">
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Start Datum</label>
+                    <input type="date" name="start_date" required
+                           class="w-full bg-cyber-dark border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Datum</label>
-                    <input type="date" name="date" required
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Eind Datum (Optioneel)</label>
+                    <input type="date" name="end_date"
                            class="w-full bg-cyber-dark border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Start Tijd (00:00 - 23:59)</label>
                     <input type="time" name="start_time" required
@@ -73,6 +73,12 @@
                            class="w-full bg-cyber-dark border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
                     <p class="text-[9px] text-white/30 mt-1">* Indien vroeger dan start, telt als volgende dag.</p>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Verwachte Aantal Personen</label>
+                <input type="number" name="attendees" min="2" max="100" required placeholder="bv. 15"
+                       class="w-full md:w-[calc(50%-12px)] bg-cyber-dark border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all">
             </div>
 
             <div class="pt-6">
