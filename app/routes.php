@@ -2,40 +2,39 @@
 declare(strict_types=1);
 
 /**
- * Centraal Route Bestand - DEFINITIEVE VERSIE
+ * Centraal Route Bestand - OPGESCHOOND & GEFIXT
  */
 
 // --- 1. Home & Redirects ---
-// Deze zorgt dat de HomeController je direct doorstuurt naar /login of /dashboard
 $router->get('/', 'HomeController', 'index');
 
-// --- 2. Authenticatie (Login/Logout/Register) ---
+// --- 2. Authenticatie ---
 $router->get('/login', 'AuthController', 'showLogin');
 $router->post('/login', 'AuthController', 'login');
 $router->get('/register', 'AuthController', 'showRegister');
 $router->post('/register', 'AuthController', 'register');
 $router->get('/logout', 'AuthController', 'logout');
 
-// --- 3. Gebruiker Dashboard (Jouw Kalender) ---
-// De Router koppelt de URL /dashboard nu direct aan jouw UserDashboardController
+// --- 3. Gebruiker Dashboard ---
 $router->get('/dashboard', 'UserDashboardController', 'index');
 
 // --- 4. Overige Gebruiker Pagina's ---
 $router->get('/resources', 'RentalController', 'index');
+$router->get('/propose', 'ProposeController', 'index');
+$router->post('/propose', 'ProposeController', 'store');
 
-// --- Propose LAN Routes ---
-$router->get('/propose', 'ProposeController', 'index');  // Formulier tonen
-$router->post('/propose', 'ProposeController', 'store'); // Formulier verwerken
-
-// --- 5. Admin Sectie (Collega) ---
+// --- 5. Admin Sectie (Slechts 1 keer!) ---
 $router->get('/admin', 'AdminController', 'index');
 $router->get('/admin/users', 'AdminController', 'users');
-$router->get('/admin/approvals', 'AdminController', 'approvals');
+
+// DEZE MOET HIER STAAN:
+$router->get('/admin/lans', 'AdminController', 'lans');
+$router->post('/admin/lans/status', 'AdminController', 'updateLanStatus');
 
 // Admin Resources
 $router->get('/admin/resources', 'AdminController', 'resources');
 $router->get('/admin/resources/create', 'AdminController', 'resourceCreate');
 $router->post('/admin/resources/create', 'AdminController', 'resourceStore');
-$router->get('/admin/resources/edit', 'AdminController', 'resourceEdit'); // verwacht ?id=...
+$router->get('/admin/resources/edit', 'AdminController', 'resourceEdit');
 $router->post('/admin/resources/edit', 'AdminController', 'resourceUpdate');
 $router->post('/admin/resources/delete', 'AdminController', 'resourceDelete');

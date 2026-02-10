@@ -78,4 +78,18 @@ class LanPartyRepository {
             'organizer_id'=> $organizerId
         ]);
     }
+
+    public function getAllForAdmin(): array {
+        $sql = "SELECT lp.*, u.username 
+            FROM lan_parties lp 
+            LEFT JOIN users u ON lp.organizer_id = u.id 
+            ORDER BY lp.created_at DESC";
+        return $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function updateStatus(int $id, string $status): bool {
+        $sql = "UPDATE lan_parties SET status = :status WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute(['status' => $status, 'id' => $id]);
+    }
 }

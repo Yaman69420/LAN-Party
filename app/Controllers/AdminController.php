@@ -3,10 +3,18 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Repositories\ItemRepository;
+use App\Repositories\LanPartyRepository;
+
 class AdminController
 {
+    private ItemRepository $itemRepo;
+    private LanPartyRepository $lanRepo;
+
     public function __construct() {
-        requireAdmin(); // Beveiliging: alleen admins mogen hier komen
+        requireAdmin();
+        $this->itemRepo = new ItemRepository();
+        $this->lanRepo = new LanPartyRepository();
     }
 
     public function index(): void {
@@ -14,72 +22,52 @@ class AdminController
     }
 
     public function users(): void {
-        // Hier zou je users ophalen uit de database
         view('admin/users');
     }
 
-    public function approvals(): void {
-        view('admin/approvals');
+    // --- HIER ZAT DE FOUT: Deze functie is nodig voor de route /admin/lans ---
+    public function lans(): void {
+        $parties = $this->lanRepo->getAllForAdmin();
+        // Let op: hij zoekt nu naar app/Views/admin/lans/index.php
+        view('admin/lans/index', ['parties' => $parties]);
     }
 
-    // --- Resources Management ---
+    public function updateLanStatus(): void {
+        if (!csrf_verify()) die('Invalid CSRF');
+        $id = (int)($_POST['id'] ?? 0);
+        $status = $_POST['status'] ?? '';
 
+        if ($id > 0) {
+            $this->lanRepo->updateStatus($id, $status);
+        }
+        header('Location: /admin/lans');
+        exit;
+    }
+
+    // --- Resources ---
     public function resources(): void {
-        $repo = new \App\Repositories\ItemRepository();
-        $items = $repo->getAll();
+        $items = $this->itemRepo->getAll();
         view('admin/resources/index', ['items' => $items]);
     }
-
-    public function resourceCreate(): void {
-        view('admin/resources/create');
-    }
-
+    public function resourceCreate(): void { view('admin/resources/create'); }
     public function resourceStore(): void {
         if (!csrf_verify()) die('Invalid CSRF');
-        
-        $name = $_POST['name'] ?? '';
-        $category = $_POST['category'] ?? '';
-        $totalStock = (int)($_POST['total_stock'] ?? 0);
-
-        $repo = new \App\Repositories\ItemRepository();
-        $repo->create($name, $category, $totalStock);
-        
-        redirect('/admin/resources');
+        $this->itemRepo->create($_POST['name'] ?? '', $_POST['category'] ?? '', (int)$_POST['total_stock']);
+        header('Location: /admin/resources'); exit;
     }
-
     public function resourceEdit(): void {
-        $id = (int)($_GET['id'] ?? 0);
-        $repo = new \App\Repositories\ItemRepository();
-        $item = $repo->find($id);
-
-        if (!$item) {
-            redirect('/admin/resources');
-        }
-
+        $item = $this->itemRepo->find((int)$_GET['id']);
+        if(!$item) { header('Location: /admin/resources'); exit; }
         view('admin/resources/edit', ['item' => $item]);
     }
-
     public function resourceUpdate(): void {
         if (!csrf_verify()) die('Invalid CSRF');
-
-        $id = (int)($_POST['id'] ?? 0);
-        $name = $_POST['name'] ?? '';
-        $category = $_POST['category'] ?? '';
-        $totalStock = (int)($_POST['total_stock'] ?? 0);
-
-        $repo = new \App\Repositories\ItemRepository();
-        $repo->update($id, $name, $category, $totalStock);
-
-        redirect('/admin/resources');
+        $this->itemRepo->update((int)$_POST['id'], $_POST['name'], $_POST['category'], (int)$_POST['total_stock']);
+        header('Location: /admin/resources'); exit;
     }
-
     public function resourceDelete(): void {
         if (!csrf_verify()) die('Invalid CSRF');
-
-        $id = (int)($_POST['id'] ?? 0);
-        $repo = new \App\Repositories\ItemRepository();
-        $repo->delete($id);
-
-        redirect('/admin/resources');
+        $this->itemRepo->delete((int)$_POST['id']);
+        header('Location: /admin/resources'); exit;
     }
 }
