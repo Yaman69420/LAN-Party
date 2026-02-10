@@ -5,16 +5,19 @@ namespace App\Controllers;
 
 use App\Repositories\ItemRepository;
 use App\Repositories\LanPartyRepository;
+use App\Repositories\RentalRepository;
 
 class AdminController
 {
     private ItemRepository $itemRepo;
     private LanPartyRepository $lanRepo;
+    private RentalRepository $rentalRepo;
 
     public function __construct() {
         requireAdmin();
         $this->itemRepo = new ItemRepository();
         $this->lanRepo = new LanPartyRepository();
+        $this->rentalRepo = new RentalRepository();
     }
 
     public function index(): void {
@@ -75,11 +78,11 @@ class AdminController
         redirect('/admin/resources');
     }
 
+
     // --- Reservation Management ---
     
     public function reservations(): void {
-        $repo = new \App\Repositories\RentalRepository();
-        $rentals = $repo->getAll();
+        $rentals = $this->rentalRepo->getAll();
         view('admin/reservations/index', ['rentals' => $rentals]);
     }
 
@@ -95,13 +98,8 @@ class AdminController
             return;
         }
 
-        $repo = new \App\Repositories\RentalRepository();
-        $repo->updateStatus($id, $status);
+        $this->rentalRepo->updateStatus($id, $status);
 
         redirect('/admin/reservations');
-    }
-}
-        $this->itemRepo->delete((int)$_POST['id']);
-        header('Location: /admin/resources'); exit;
     }
 }
