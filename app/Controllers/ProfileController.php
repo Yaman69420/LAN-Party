@@ -131,7 +131,7 @@ class ProfileController
      */
     public function edit(): void {
         $user = $this->userRepo->findById((int)$_SESSION['user']['id']);
-        view('user/edit', ['user' => $user]);
+        view('user/edit', ['user' => (array)$user]);
     }
 
     /**
@@ -141,7 +141,7 @@ class ProfileController
         if (!csrf_verify()) die('CSRF Mismatch');
 
         $userId = (int)$_SESSION['user']['id'];
-        $user = $this->userRepo->findById($userId);
+        $user = (array)$this->userRepo->findById($userId);
 
         $publicPath = $_SERVER['DOCUMENT_ROOT'] . '/uploads/avatars/';
         $imagePath = $user['profile_image'] ?? null;
