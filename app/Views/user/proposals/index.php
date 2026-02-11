@@ -17,8 +17,8 @@
                 <span class="text-xs">📡</span>
                 <span class="text-[10px] uppercase font-bold tracking-[0.3em]">Active Transmissions</span>
             </div>
-            <h2 class="text-white font-orbitron text-3xl uppercase italic tracking-wider">Open Proposals</h2>
-            <p class="text-cyber-gray text-xs mt-2">Stem op jouw favoriete LAN-party ideeën of sluit je aan bij een operatie.</p>
+            <h2 class="text-white font-orbitron text-3xl uppercase italic tracking-wider">Upcoming Operations</h2>
+            <p class="text-cyber-gray text-xs mt-2">Join confirmed LAN operations or propose a new mission.</p>
         </div>
         <a href="/propose" class="group flex items-center px-4 py-2 border border-cyber-purple/50 bg-cyber-purple/10 hover:bg-cyber-purple/20 transition-all rounded-sm">
             <span class="mr-2 text-lg text-cyber-purple group-hover:text-white transition-colors">+</span>
