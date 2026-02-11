@@ -23,8 +23,8 @@
                     <div class="text-lg text-white font-orbitron tracking-tight group-hover:neon-text-cyan transition-all">
                         <?= htmlspecialchars($user['username']) ?>
                     </div>
-                    <div class="text-xs text-cyber-gray/60 italic mt-1 font-mono">
-                        ID: [ <?= str_pad((string)$user['id'], 4, '0', STR_PAD_LEFT) ?> ] // <?= htmlspecialchars($user['email']) ?>
+                    <div class="text-[10px] text-cyber-cyan/30 font-mono mt-1 uppercase tracking-widest">
+                        SECURE_CONNECTION_ESTABLISHED
                     </div>
                 </td>
 
