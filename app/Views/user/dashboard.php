@@ -23,7 +23,7 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
 
 <div class="mt-4 w-full" x-data="{
     showPopup: false,
-    pName: 'Select a mission',
+    pName: '',
     pDate: '',
     pLaptops: 0,
     pAttendees: 0,
@@ -88,25 +88,6 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
                         </div>
                     </div>
                 <?php endforeach; ?>
-
-                <div class="flex-1 bg-gradient-to-br from-cyber-dark to-black border border-cyber-purple/30 p-4 rounded-xl relative overflow-hidden group flex flex-col justify-center min-h-[120px]">
-                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-cyber-purple/20 blur-3xl rounded-full"></div>
-                    <div class="relative z-10">
-                        <h3 class="text-white font-orbitron text-sm italic uppercase mb-1">Squad Capacity</h3>
-                        <p class="text-cyber-cyan text-[10px] mb-4 uppercase tracking-wider font-bold" x-text="pName"></p>
-
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-[10px] text-white font-bold uppercase">
-                                <span>Units: <span x-text="pAttendees"></span>/150</span>
-                                <span class="text-cyber-purple" x-text="Math.round((pAttendees / 150) * 100) + '%'"></span>
-                            </div>
-                            <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-cyber-purple shadow-[0_0_10px_rgba(188,19,254,0.8)] transition-all duration-700 ease-out"
-                                     :style="'width: ' + Math.min(100, Math.round((pAttendees / 150) * 100)) + '%'"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
