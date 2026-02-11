@@ -5,7 +5,7 @@ namespace App\Controllers;
 
 use App\Repositories\UserRepository;
 use App\Repositories\RentalRepository;
-use DateTime; // Dit hebben we nodig om dagen te berekenen!
+use DateTime;
 
 class UserDashboardController
 {
@@ -17,61 +17,55 @@ class UserDashboardController
         $this->rentalRepo = new RentalRepository();
     }
 
-    public function index(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+    public function index(): void {
+        // Sessie starten indien nodig
+        if (session_status() === PHP_SESSION_NONE) { session_start(); }
+        if (!isset($_SESSION['user'])) { header('Location: /login'); exit; }
 
-        if (!function_exists('requireLogin')) {
-            if (!isset($_SESSION['user'])) {
-                header('Location: /login');
-                exit;
-            }
-        } else {
-            requireLogin();
-        }
-
-        // 1. Haal alle LAN parties op uit de database
         $rawParties = $this->userRepo->getAllParties();
-
         $parties = [];
+
         foreach($rawParties as $p) {
+            // DE HARDE FILTER: Haal status op, forceer kleine letters en trim spaties.
+            $status = trim(strtolower((string)($p['status'] ?? '')));
+
+            // Als het NIET exact 'approved' is, slaan we deze over!
+            if ($status !== 'approved') {
+                continue;
+            }
+
             $startDate = $p['start_date'] ?? null;
-            // Als de einddatum leeg is in de database, gebruiken we de startdatum (1 dag)
             $endDate = $p['end_date'] ?? $startDate;
 
             if ($startDate) {
                 $start = new DateTime($startDate);
                 $end = new DateTime($endDate);
 
-                // Zet de tijd op 00:00:00 om fouten met uren te voorkomen
+                // Tijd strippen om puur op datum te vergelijken
                 $start->setTime(0, 0, 0);
                 $end->setTime(0, 0, 0);
 
-                // DE FIX: Loop door alle dagen van start tot en met eind
                 while ($start <= $end) {
                     $dateKey = $start->format('Y-m-d');
 
-                    // Zet het feestje in de array voor DEZE specifieke dag
-                    $parties[$dateKey] = $p;
+                    // Data klaarmaken voor de view (en jouw pop-up!)
+                    $partyData = $p;
+                    $partyData['laptops'] = (int)($p['reserved_laptops'] ?? 0);
+                    $partyData['vr'] = (int)($p['reserved_vr'] ?? 0);
 
-                    // Schuif de datum 1 dag op (+1 day)
+                    $parties[$dateKey] = $partyData;
+
                     $start->modify('+1 day');
                 }
             }
         }
 
-        // 2. Haal de rest van de data op
-        $featuredResources = $this->userRepo->getFeaturedResources();
-        $rentals = $this->rentalRepo->getByUser($_SESSION['user']['id']);
-
-        // 3. Stuur alles naar de View
+        // Gegevens doorsturen naar de weergave (View)
         view('user/dashboard', [
-            'username'  => $_SESSION['user']['username'] ?? 'Operative',
-            'parties'   => $parties, // Dit bevat nu meerdere dagen voor hetzelfde feestje!
-            'resources' => $featuredResources,
-            'rentals'   => $rentals
+            'username' => $_SESSION['user']['username'] ?? 'Operative',
+            'parties' => $parties,
+            'resources' => $this->userRepo->getFeaturedResources(),
+            'rentals' => $this->rentalRepo->getByUser((int)$_SESSION['user']['id'])
         ]);
     }
 }
