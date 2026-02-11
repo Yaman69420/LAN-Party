@@ -8,3 +8,6 @@ PHP OOP MVC project voor LAN-Party evenementen - SYNTRA Groepswerk
 - MySQL (via MAMP/XAMPP)
 - phpMyAdmin
 
+## Documentatie
+
+
