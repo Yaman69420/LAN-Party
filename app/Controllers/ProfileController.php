@@ -147,15 +147,35 @@ class ProfileController
         $imagePath = $user['profile_image'] ?? null;
 
         if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['avatar'];
+            
+            // 1. Validate Size (Max 2MB)
+            if ($file['size'] > 2 * 1024 * 1024) {
+                // In production: handle error gracefully (flash message)
+                die('File too large (max 2MB)');
+            }
+
+            // 2. Validate Type (MIME & Extension)
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $allowedExts  = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mime = $finfo->file($file['tmp_name']);
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+            if (!in_array($mime, $allowedMimes) || !in_array($ext, $allowedExts)) {
+                die('Invalid file type. Only JPG, PNG, GIF, WEBP allowed.');
+            }
+
+            // 3. Secure Storage
             if (!is_dir($publicPath)) {
                 mkdir($publicPath, 0777, true);
             }
 
-            // Veiligheidscheck: spaties naar underscores
-            $safeFileName = str_replace(' ', '_', $_FILES['avatar']['name']);
-            $filename = time() . '_' . $safeFileName;
+            // Generate random filename to prevent overwrites and guessing
+            $filename = uniqid('avatar_', true) . '.' . $ext;
 
-            if (move_uploaded_file($_FILES['avatar']['tmp_name'], $publicPath . $filename)) {
+            if (move_uploaded_file($file['tmp_name'], $publicPath . $filename)) {
                 // Oude foto opruimen
                 if ($imagePath && file_exists($publicPath . $imagePath)) {
                     unlink($publicPath . $imagePath);
