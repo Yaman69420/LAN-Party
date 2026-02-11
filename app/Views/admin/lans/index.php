@@ -39,7 +39,7 @@
                             [ <?= htmlspecialchars($lan['contact_email'] ?? 'UNKNOWN_SOURCE') ?> ]
                         </span>
                         <span class="text-[10px] text-cyber-purple font-black tracking-[0.2em] uppercase">
-                            <?= $lan['expected_attendees'] ?? 0 ?> Units Active
+                            <?= $lan['expected_attendees'] ?? 0 ?> Atendees Active
                         </span>
                     </div>
                 </td>

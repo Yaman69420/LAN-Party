@@ -31,17 +31,9 @@ class UserRepository
     public function getAllParties(): array {
         $sql = "SELECT lp.*, 
                 (SELECT COALESCE(SUM(r.quantity), 0) FROM rentals r 
-                 JOIN items i ON r.item_id = i.id 
-                 WHERE LOWER(i.name) LIKE '%laptop%' 
+                 WHERE r.item_id = 1 
                  AND r.rental_status = 'reserved' 
-                 AND r.lan_party_id = lp.id) as reserved_laptops,
-                 
-                (SELECT COALESCE(SUM(r.quantity), 0) FROM rentals r 
-                 JOIN items i ON r.item_id = i.id 
-                 WHERE (LOWER(i.name) LIKE '%vr%' OR LOWER(i.category) LIKE '%vr%') 
-                 AND r.rental_status = 'reserved' 
-                 AND r.lan_party_id = lp.id) as reserved_vr
-                 
+                 AND r.lan_party_id = lp.id) as reserved_laptops
                 FROM lan_parties lp 
                 WHERE LOWER(lp.status) = 'approved'
                 ORDER BY start_date ASC";
