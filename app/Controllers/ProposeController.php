@@ -19,7 +19,7 @@ class ProposeController
     {
         if (!isset($_SESSION['user'])) { header('Location: /login'); exit; }
 
-        $proposals = $this->lanRepo->getProposals();
+        $proposals = $this->lanRepo->getApprovedParties();
         
         foreach ($proposals as &$prop) {
             $prop['votes'] = $this->lanRepo->getVotes($prop['id']);

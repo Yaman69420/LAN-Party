@@ -139,6 +139,17 @@ class LanPartyRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getApprovedParties(): array {
+        $sql = "SELECT lp.*, u.username as organizer
+                FROM lan_parties lp 
+                LEFT JOIN users u ON lp.organizer_id = u.id 
+                WHERE lp.status = 'approved' 
+                ORDER BY lp.start_date ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /**
      * Stem op een proposal (of schrijf je in)
      */
@@ -215,6 +226,24 @@ class LanPartyRepository {
     public function findById(int $id): ?array {
         $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE id = :id LIMIT 1");
         $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    public function findForDate(string $date): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE status = 'approved' AND :date BETWEEN start_date AND end_date LIMIT 1");
+        $stmt->execute(['date' => $date]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    public function getAllUpcoming(): array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE start_date >= CURDATE() AND status = 'approved' ORDER BY start_date ASC");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getNextUpcoming(): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE start_date >= CURDATE() AND status = 'approved' ORDER BY start_date ASC LIMIT 1");
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 }

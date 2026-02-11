@@ -55,11 +55,31 @@
                 <?= csrf_field() ?>
                 <input type="hidden" name="item_id" :value="selectedItem?.id">
                 
+                <!-- LAN Party Selection -->
                 <div>
-                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Target Date & Time</label>
-                    <input type="datetime-local" name="reservation_date" required 
-                           class="w-full bg-[#1a1c23] border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all font-mono text-sm [color-scheme:dark] uppercase">
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Target Mission (LAN)</label>
+                    <select name="lan_party_id" required 
+                           class="w-full bg-[#1a1c23] border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all font-mono text-sm uppercase appearance-none">
+                        <?php if (empty($upcomingLans)): ?>
+                            <option value="" disabled selected>NO ACTIVE MISSIONS</option>
+                        <?php else: ?>
+                            <?php foreach ($upcomingLans as $l): ?>
+                                <option value="<?= $l['id'] ?>">
+                                    <?= htmlspecialchars($l['name']) ?> [<?= date('d M', strtotime($l['start_date'])) ?>]
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1" max="5" required 
+                           class="w-full bg-[#1a1c23] border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all font-mono text-sm">
+                </div>
+
+                <!-- Date/Time (Optional specific time) -->
 
                 <div class="pt-2 space-y-3">
                     <button type="submit"
