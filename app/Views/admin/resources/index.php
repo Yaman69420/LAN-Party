@@ -15,7 +15,6 @@
     <table class="w-full text-left border-collapse">
         <thead>
         <tr class="text-[11px] font-orbitron text-yellow-500/50 uppercase tracking-[0.2em] border-b border-white/10">
-            <th class="pb-4 pl-4">Asset ID</th>
             <th class="pb-4">Description</th>
             <th class="pb-4">Classification</th>
             <th class="pb-4 text-center">Stock Level</th>
@@ -25,9 +24,6 @@
         <tbody class="text-sm">
         <?php foreach ($items as $item): ?>
             <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                <td class="py-6 pl-4 font-mono text-xs text-gray-600">
-                    #<?= str_pad((string)$item->id, 3, '0', STR_PAD_LEFT) ?>
-                </td>
 
                 <td class="py-6 text-white font-orbitron tracking-tight group-hover:text-yellow-500 transition-all text-lg">
                     <?= htmlspecialchars($item->name) ?>

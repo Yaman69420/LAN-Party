@@ -14,7 +14,7 @@ class AuthController
     }
 
     public function login(): void {
-        // CSRF beveiliging (deze laten we staan zoals hij was)
+        // CSRF beveiliging
         if (function_exists('csrf_verify') && !csrf_verify()) {
             die('Invalid CSRF token');
         }
@@ -22,20 +22,23 @@ class AuthController
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        // Haal gebruiker op (Dit komt terug als Object door onze fix in UserRepository)
         $user = $this->userRepo->findByEmail($email);
 
-        if ($user && password_verify($password, $user->password_hash)) {
+        // --- BULLETPROOF FIX ---
+        // Haal het wachtwoord veilig op, ongeacht of $user een Array of Object is.
+        $hash = '';
+        if (is_array($user)) {
+            $hash = $user['password_hash'] ?? '';
+        } elseif (is_object($user)) {
+            $hash = $user->password_hash ?? '';
+        }
+
+        // Check of we een gebruiker hebben EN of het wachtwoord klopt met de hash
+        if ($user && password_verify($password, $hash)) {
             // Veiligheid: Regenereer sessie ID bij inloggen
             session_regenerate_id(true);
 
-            // --- DE OPLOSSING ---
-            // OUDE CODE (Fout):
-            // $_SESSION['user'] = ['id' => $user->id, 'username' => $user->username, 'role' => $user->role];
-
-            // NIEUWE CODE (Goed):
-            // We zetten het hele object om naar een array.
-            // Hierdoor zit 'profile_image', 'first_name', etc. er automatisch bij!
+            // Zet alles (array of object) altijd veilig om naar een array voor de sessie
             $_SESSION['user'] = (array) $user;
 
             header("Location: /dashboard");

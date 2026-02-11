@@ -13,6 +13,24 @@ $username = $user['username'] ?? 'Guest';
 $role = $user['role'] ?? 'visitor';
 $isLoggedIn = ($user !== null);
 $navImg = $user['profile_image'] ?? null;
+
+// --- DYNAMISCHE NAVIGATIE LOGICA ---
+// Haal het huidige pad op (bijv. '/dashboard' of '/LAN-Party/dashboard')
+$currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Helper functie om te checken of een menu-item actief is
+function getNavClass(string $targetPath, string $currentPath, string $activeColorClass = 'text-cyber-cyan', string $activeShadowClass = 'drop-shadow-[0_0_8px_#00f2ff]'): string {
+    // Checken of het targetPath voorkomt in de huidige URL
+    $isActive = (strpos($currentPath, $targetPath) !== false);
+
+    if ($isActive) {
+        // Wat we teruggeven als de pagina actief is (Inclusief het blauwe lijntje aan de linkerkant!)
+        return "opacity-100 $activeColorClass $activeShadowClass relative before:absolute before:left-0 before:w-1 before:h-8 before:bg-cyber-cyan before:shadow-[0_0_15px_#00f2ff] before:rounded-r-full";
+    } else {
+        // Wat we teruggeven als hij NIET actief is
+        return "opacity-60 text-white hover:opacity-100 hover:$activeColorClass hover:$activeShadowClass";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -49,48 +67,68 @@ $navImg = $user['profile_image'] ?? null;
 <body class="bg-cyber-black text-cyber-gray font-rajdhani cyber-grid min-h-screen text-base overflow-hidden">
 
 <div class="flex h-screen">
-    <aside class="w-64 bg-cyber-dark border-r border-white/5 flex flex-col py-6 shadow-2xl z-20">
-        <div class="px-8 mb-10 flex justify-center">
-            <div class="w-16 h-16 bg-cyber-cyan/5 rounded-lg flex items-center justify-center border border-cyber-cyan neon-border-cyan transform hover:scale-105 transition-transform duration-300">
-                <span class="text-cyber-cyan text-3xl">🎮</span>
+    <aside class="w-28 bg-cyber-dark/40 backdrop-blur-xl border-r border-white/5 flex flex-col py-8 z-20 relative">
+        <div class="px-4 mb-12 flex justify-center">
+            <div class="relative group">
+                <div class="absolute -inset-2 bg-cyber-cyan opacity-20 blur group-hover:opacity-40 transition duration-300"></div>
+                <svg class="relative w-10 h-10 text-cyber-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M6 12L3.269 9.725C2.56 9.133 2.56 8.067 3.269 7.475L7.475 3.269C8.067 2.56 9.133 2.56 9.725 3.269L12 6M18 12L20.731 14.275C21.44 14.867 21.44 15.933 20.731 16.525L16.525 20.731C15.933 21.44 14.867 21.44 14.275 20.731L12 18M12 12L15 9M12 12L9 15" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="2" fill="currentColor" class="animate-pulse"/>
+                </svg>
             </div>
         </div>
-        <nav class="flex-1 space-y-2">
-            <a href="/dashboard" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-cyan hover:bg-cyber-cyan/5 border-l-4 border-transparent hover:border-cyber-cyan transition-all duration-300">
-                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-cyan group-hover:opacity-100 transition-opacity">📊</span>
-                <span class="font-bold tracking-wider uppercase text-sm group-hover:neon-text-cyan">Dashboard</span>
-            </a>
-            <a href="/resources" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-cyan hover:bg-cyber-cyan/5 border-l-4 border-transparent hover:border-cyber-cyan transition-all duration-300">
-                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-cyan group-hover:opacity-100 transition-opacity">🛡️</span>
-                <span class="font-medium tracking-wider uppercase text-sm">The Armory</span>
+
+        <nav class="flex-1 flex flex-col items-center space-y-8 relative w-full">
+
+            <a href="/dashboard" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/dashboard', $currentPath) ?>">
+                <svg class="w-8 h-8 mb-2 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span class="text-[9px] font-orbitron tracking-widest uppercase text-center transition-colors duration-300">Dashboard</span>
             </a>
 
-            <a href="/proposals" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-purple hover:bg-cyber-purple/5 border-l-4 border-transparent hover:border-cyber-purple transition-all duration-300">
-                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-purple group-hover:opacity-100 transition-opacity">📡</span>
-                <span class="font-medium tracking-wider uppercase text-sm">Proposals</span>
+            <a href="/propose" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/propose', $currentPath, 'text-cyber-purple', 'drop-shadow-[0_0_8px_#bc13fe]') ?>">
+                <svg class="w-8 h-8 mb-2 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="text-[9px] font-orbitron tracking-widest uppercase text-center transition-colors duration-300">Propose LAN</span>
             </a>
 
-            <a href="/propose" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-purple hover:bg-cyber-purple/5 border-l-4 border-transparent hover:border-cyber-purple transition-all duration-300">
-                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-purple group-hover:opacity-100 transition-opacity">🛰️</span>
-                <span class="font-medium tracking-wider uppercase text-sm">Propose LAN</span>
+            <a href="/resources" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/resources', $currentPath) ?>">
+                <svg class="w-8 h-8 mb-2 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="text-[9px] font-orbitron tracking-widest uppercase text-center transition-colors duration-300">The Armory</span>
             </a>
-            <a href="/profile" class="group flex items-center px-8 py-3 text-cyber-gray hover:text-cyber-cyan hover:bg-cyber-cyan/5 border-l-4 border-transparent hover:border-cyber-cyan transition-all duration-300">
-                <span class="mr-4 text-lg opacity-70 group-hover:text-cyber-cyan group-hover:opacity-100 transition-opacity">👤</span>
-                <span class="font-medium tracking-wider uppercase text-sm group-hover:neon-text-cyan">My Profile</span>
+
+            <a href="/proposals" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/proposals', $currentPath, 'text-cyber-purple', 'drop-shadow-[0_0_8px_#bc13fe]') ?>">
+                <svg class="w-8 h-8 mb-2 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" stroke-linecap="round"/><circle cx="5" cy="19" r="1"/>
+                </svg>
+                <span class="text-[9px] font-orbitron tracking-widest uppercase text-center transition-colors duration-300">Proposals</span>
             </a>
+
+            <a href="/profile" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/profile', $currentPath) ?>">
+                <svg class="w-8 h-8 mb-2 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span class="text-[9px] font-orbitron tracking-widest uppercase text-center transition-colors duration-300">Profile</span>
+            </a>
+
             <?php if ($role === 'admin'): ?>
-                <div class="mt-8 pt-4 border-t border-white/5 mx-4">
-                    <p class="px-4 text-[10px] text-cyber-purple uppercase tracking-[0.2em] font-bold mb-2">Command Center</p>
-                    <a href="/admin" class="group flex items-center px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-all">
-                        <span class="mr-3">⚙️</span>
-                        <span class="text-xs font-bold uppercase tracking-wider">Admin Panel</span>
+                <div class="mt-auto pb-4 w-full">
+                    <a href="/admin" class="group flex flex-col items-center justify-center w-full transition-all duration-300 <?= getNavClass('/admin', $currentPath, 'text-red-500', 'drop-shadow-[0_0_8px_#ef4444]') ?>">
+                        <svg class="w-6 h-6 mb-1 transition-colors duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        <span class="text-[8px] font-orbitron tracking-[0.2em] uppercase transition-colors duration-300">Admin</span>
                     </a>
                 </div>
             <?php endif; ?>
         </nav>
-        <div class="px-8 pt-6 border-t border-white/5">
-            <p class="text-[10px] text-white/20 uppercase tracking-widest text-center">System v2.0</p>
-        </div>
     </aside>
 
     <div class="flex-1 flex flex-col relative overflow-hidden">
@@ -114,13 +152,9 @@ $navImg = $user['profile_image'] ?? null;
 
                         <div class="w-10 h-10 rounded border border-cyber-cyan p-0.5 shadow-[0_0_15px_rgba(0,242,255,0.2)] overflow-hidden bg-black">
                             <?php
-                            // 1. Check of er een foto in de sessie zit
                             if (!empty($navImg)) {
-                                // De link naar de foto. Let op: hoofdlettergevoelig!
-                                // Zorg dat de mapnaam 'LAN-Party' exact klopt met jouw map in WAMP/www
                                 $navSrc = '/LAN-Party/public/uploads/avatars/' . rawurlencode($navImg);
                             } else {
-                                // Geen foto? Dan de standaard letters
                                 $navSrc = 'https://ui-avatars.com/api/?name=' . urlencode($username) . '&background=0b0c10&color=00f2ff&bold=true';
                             }
                             ?>

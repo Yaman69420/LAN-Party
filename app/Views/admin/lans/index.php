@@ -11,30 +11,53 @@
         <thead>
         <tr class="text-[11px] font-orbitron text-cyber-cyan/50 uppercase tracking-[0.2em] border-b border-white/10">
             <th class="pb-4 pl-4 w-1/3">Operation & Intel</th>
-            <th class="pb-4 w-1/4">Contact & Units</th>
-            <th class="pb-4 text-right pr-4">Status & Control</th>
+            <th class="pb-4 w-1/5">Contact & Units</th>
+            <th class="pb-4 w-1/5">When</th> <th class="pb-4 text-right pr-4">Status & Control</th>
         </tr>
         </thead>
         <tbody class="text-sm">
         <?php foreach ($parties as $lan): ?>
             <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+
                 <td class="py-6 pl-4">
                     <div class="text-lg text-white font-orbitron tracking-tight group-hover:neon-text-cyan transition-all">
                         <?= htmlspecialchars($lan['name']) ?>
                     </div>
+
                     <div class="text-xs text-cyber-gray/60 italic mt-2 max-w-md leading-relaxed">
                         <?= htmlspecialchars($lan['description'] ?? 'No intel provided for this mission.') ?>
+                    </div>
+
+                    <div class="text-[9px] text-white/40 font-mono mt-3 uppercase tracking-widest">
+                        > REQUEST LOGGED: <span class="text-white/70"><?= date('d M Y @ H:i', strtotime($lan['created_at'])) ?></span>
                     </div>
                 </td>
 
                 <td class="py-6">
                     <div class="flex flex-col space-y-1">
-                            <span class="text-cyber-cyan font-mono text-xs tracking-tighter uppercase">
-                                [ <?= htmlspecialchars($lan['contact_email'] ?? 'UNKNOWN_SOURCE') ?> ]
-                            </span>
+                        <span class="text-cyber-cyan font-mono text-xs tracking-tighter uppercase">
+                            [ <?= htmlspecialchars($lan['contact_email'] ?? 'UNKNOWN_SOURCE') ?> ]
+                        </span>
                         <span class="text-[10px] text-cyber-purple font-black tracking-[0.2em] uppercase">
-                                <?= $lan['expected_attendees'] ?? 0 ?> Units Active
+                            <?= $lan['expected_attendees'] ?? 0 ?> Units Active
+                        </span>
+                    </div>
+                </td>
+
+                <td class="py-6">
+                    <div class="flex flex-col space-y-1">
+                        <span class="text-cyber-cyan font-mono text-xs tracking-tighter uppercase">
+                            <?= date('d M Y', strtotime($lan['start_date'])) ?>
+                        </span>
+                        <?php if ($lan['start_date'] !== $lan['end_date']): ?>
+                            <span class="text-[10px] text-cyber-purple font-black tracking-[0.2em] uppercase">
+                                TO <?= date('d M Y', strtotime($lan['end_date'])) ?>
                             </span>
+                        <?php else: ?>
+                            <span class="text-[10px] text-cyber-purple font-black tracking-[0.2em] uppercase">
+                                1-DAY EVENT
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </td>
 

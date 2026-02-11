@@ -13,7 +13,6 @@ class UserRepository
     {
         $wrapper = Database::getInstance();
 
-        // Automatische detectie van de database connectie
         if ($wrapper instanceof PDO) {
             $this->db = $wrapper;
         } elseif (method_exists($wrapper, 'getConnection')) {
@@ -27,35 +26,66 @@ class UserRepository
         }
     }
 
-    // --- LEES OPERATIES (FINDERS) ---
+    // --- KALENDER & DASHBOARD DATA ---
+
+    public function getAllParties(): array {
+        $sql = "SELECT lp.*, 
+                (SELECT COALESCE(SUM(r.quantity), 0) FROM rentals r 
+                 JOIN items i ON r.item_id = i.id 
+                 WHERE LOWER(i.name) LIKE '%laptop%' 
+                 AND r.rental_status = 'reserved' 
+                 AND r.lan_party_id = lp.id) as reserved_laptops,
+                 
+                (SELECT COALESCE(SUM(r.quantity), 0) FROM rentals r 
+                 JOIN items i ON r.item_id = i.id 
+                 WHERE (LOWER(i.name) LIKE '%vr%' OR LOWER(i.category) LIKE '%vr%') 
+                 AND r.rental_status = 'reserved' 
+                 AND r.lan_party_id = lp.id) as reserved_vr
+                 
+                FROM lan_parties lp 
+                WHERE LOWER(lp.status) = 'approved'
+                ORDER BY start_date ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getFeaturedResources(): array {
+        $sql = "SELECT * FROM items ORDER BY id ASC LIMIT 4";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // --- USER FINDERS (Ophalen voor Auth/Profiel = OBJECT) ---
 
     public function findById(int $id)
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE id = :id");
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC); // Aangepast naar ASSOC voor consistentie met dev
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
-    public function findBySlug(string $slug): ?array 
+    public function findBySlug(string $slug)
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE slug = :slug LIMIT 1");
         $stmt->execute(['slug' => $slug]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?: null;
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function findByEmail(string $email)
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function findByUsername(string $username)
     {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
         $stmt->execute(['username' => $username]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     public function getAllUsers(): array
@@ -65,25 +95,23 @@ class UserRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- ZOEK & SOCIAAL ---
+    // --- ZOEK & SOCIAAL (VRIENDEN) ---
 
-    public function searchUsers(string $query, int $excludeId): array 
+    public function searchUsers(string $query, int $excludeId): array
     {
-        // De 'dev' versie is beter: selecteert specifieke kolommen en gebruikt slug
         $stmt = $this->db->prepare("SELECT id, username, first_name, last_name, slug, profile_image FROM users WHERE username LIKE :q AND id != :excl LIMIT 10");
         $stmt->execute(['q' => "%$query%", 'excl' => $excludeId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getFriends(int $userId): array 
+    public function getFriends(int $userId): array
     {
-        // De 'dev' versie met de JOIN is veel efficiënter dan losse queries
         $sql = "SELECT u.id, u.username, u.slug, u.profile_image, u.first_name, u.last_name 
                 FROM users u
                 JOIN friends f ON (u.id = f.friend_id OR u.id = f.user_id)
                 WHERE (f.user_id = :uid1 OR f.friend_id = :uid2)
                 AND u.id != :uid3 AND f.status = 'accepted'";
-        
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             'uid1' => $userId,
@@ -93,7 +121,7 @@ class UserRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getFriendshipStatus(int $userId, int $friendId): ?string 
+    public function getFriendshipStatus(int $userId, int $friendId): ?string
     {
         $sql = "SELECT status FROM friends 
                 WHERE (user_id = :u1 AND friend_id = :f1) 
@@ -109,7 +137,7 @@ class UserRepository
         return $result ? $result['status'] : null;
     }
 
-    public function sendFriendRequest(int $userId, int $friendId): bool 
+    public function sendFriendRequest(int $userId, int $friendId): bool
     {
         if ($this->getFriendshipStatus($userId, $friendId)) return false;
 
@@ -117,7 +145,7 @@ class UserRepository
         return $this->db->prepare($sql)->execute(['u' => $userId, 'f' => $friendId]);
     }
 
-    public function getPendingRequests(int $userId): array 
+    public function getPendingRequests(int $userId): array
     {
         $sql = "SELECT f.id as request_id, u.id, u.username, u.profile_image 
                 FROM friends f
@@ -128,7 +156,7 @@ class UserRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function acceptFriendRequest(int $requestId, int $userId): bool 
+    public function acceptFriendRequest(int $requestId, int $userId): bool
     {
         $sql = "UPDATE friends SET status = 'accepted' WHERE id = :id AND friend_id = :uid";
         return $this->db->prepare($sql)->execute(['id' => $requestId, 'uid' => $userId]);
@@ -154,12 +182,11 @@ class UserRepository
         ]);
     }
 
-    public function create(string $username, string $email, string $passwordhash, string $firstName = '', string $lastName = ''): bool 
+    public function create(string $username, string $email, string $passwordhash, string $firstName = '', string $lastName = ''): bool
     {
-        // Slug generatie (uit dev branch)
+        // Slug generatie
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $username), '-'));
-        
-        // Uniek maken indien nodig
+
         if ($this->findBySlug($slug)) {
             $slug .= '-' . time();
         }
@@ -168,29 +195,14 @@ class UserRepository
             INSERT INTO users (username, slug, email, password_hash, first_name, last_name, role, is_active) 
             VALUES (:username, :slug, :email, :password_hash, :first_name, :last_name, 'user', 1)
         ");
-        
+
         return $stmt->execute([
-            'username' => $username, 
+            'username' => $username,
             'slug' => $slug,
-            'email' => $email, 
+            'email' => $email,
             'password_hash' => $passwordhash,
-            'first_name' => $firstName, 
+            'first_name' => $firstName,
             'last_name' => $lastName
         ]);
-    }
-
-    // Haalt 3 specifieke items op voor de 'The Armory' sidebar
-    public function getFeaturedResources(): array {
-        $sql = "SELECT * FROM items ORDER BY id ASC LIMIT 3";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Haalt alle parties op voor de kalender
-    public function getAllParties(): array {
-        $stmt = $this->db->prepare("SELECT * FROM lan_parties ORDER BY start_date ASC");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
