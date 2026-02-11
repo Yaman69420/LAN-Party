@@ -230,7 +230,8 @@ class LanPartyRepository {
     }
 
     public function findForDate(string $date): ?array {
-        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE status = 'approved' AND :date BETWEEN start_date AND end_date LIMIT 1");
+        // Gebruik DATE() functie om alleen de datum te vergelijken, negeer de tijd
+        $stmt = $this->db->prepare("SELECT * FROM lan_parties WHERE status = 'approved' AND :date BETWEEN DATE(start_date) AND DATE(end_date) LIMIT 1");
         $stmt->execute(['date' => $date]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }

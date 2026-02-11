@@ -175,7 +175,6 @@
                             <!-- Details -->
                             <div class="mt-auto flex justify-between items-end">
                                 <div class="text-[10px] text-white/40 font-mono leading-relaxed">
-                                    ID: #<?= sprintf('%03d', $item->id) ?><br>
                                     STOCK: <span class="text-white/80"><?= $item->total_stock ?></span> UNITS
                                 </div>
                                 

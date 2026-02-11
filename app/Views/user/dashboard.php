@@ -25,11 +25,13 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
     showPopup: false,
     pName: '',
     pDate: '',
+    pTime: '',
     pLaptops: 0,
     pAttendees: 0,
-    openParty(name, date, laptops, attendees) {
+    openParty(name, date, time, laptops, attendees) {
         this.pName = name;
         this.pDate = date;
+        this.pTime = time;
         this.pLaptops = laptops;
         this.pAttendees = attendees;
         this.showPopup = true;
@@ -62,7 +64,7 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
                     ?>
                     <div class="relative h-32 border rounded-sm transition-all duration-300 p-2 flex flex-col justify-between group <?= $glowClass ?>"
                             <?php if($hasParty): ?>
-                                @click="openParty('<?= addslashes($party['name']) ?>', '<?= date('d M Y', strtotime($dateKey)) ?>', <?= $party['laptops'] ?>, <?= $party['attendees'] ?>)"
+                                @click="openParty('<?= addslashes($party['name']) ?>', '<?= date('d M Y', strtotime($dateKey)) ?>', '<?= $party['time_string'] ?>', <?= $party['laptops'] ?>, <?= $party['attendees'] ?>)"
                             <?php endif; ?>>
                         <span class="font-orbitron text-sm <?= $hasParty ? 'text-white font-bold' : 'text-white/20' ?>"><?= $day ?></span>
                         <?php if($hasParty): ?>
@@ -95,7 +97,11 @@ $paddingDays = ($firstDayIndex == 0) ? 6 : $firstDayIndex - 1;
     <div x-cloak x-show="showPopup" style="display: none;" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"></div>
     <div x-cloak x-show="showPopup" style="display: none;" @click.away="showPopup = false" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] bg-[#0b0c10] border-2 border-cyber-cyan p-8 shadow-[0_0_50px_rgba(0,242,255,0.4)] z-[9999] rounded-xl text-center">
         <h3 class="text-white font-orbitron text-base font-bold uppercase tracking-widest mb-2" x-text="'INTEL: ' + pName"></h3>
-        <p class="text-cyber-cyan text-xs font-bold mb-8 uppercase" x-text="pDate"></p>
+        <p class="text-cyber-cyan text-xs font-bold mb-8 uppercase">
+            <span x-text="pDate"></span>
+            <span class="mx-2 text-white/20">|</span>
+            <span x-text="pTime" class="text-white"></span>
+        </p>
 
         <div class="space-y-8 text-left">
             <div>

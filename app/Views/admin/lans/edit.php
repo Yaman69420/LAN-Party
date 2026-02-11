@@ -34,21 +34,42 @@
                           class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-purple focus:outline-none transition-all text-sm leading-relaxed"><?= htmlspecialchars($lan['description']) ?></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
                     <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Expected Units</label>
                     <input type="number" name="attendees" value="<?= $lan['expected_attendees'] ?>" required
                            class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all font-mono">
                 </div>
+                 <!-- Empty div to keep grid alignment if needed, or just let it flow -->
+                 <div class="hidden md:block"></div>
+            </div>
+
+            <!-- Start Date & Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Start Date</label>
-                    <input type="date" name="start_date" value="<?= $lan['start_date'] ?>" required
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Start Datum</label>
+                    <input type="date" name="start_date" value="<?= date('Y-m-d', strtotime($lan['start_date'])) ?>" required
                            class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">End Date</label>
-                    <input type="date" name="end_date" value="<?= $lan['end_date'] ?>" required
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Start Tijd (00:00 - 23:59)</label>
+                    <input type="time" name="start_time" value="<?= date('H:i', strtotime($lan['start_date'])) ?>" required
                            class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
+                </div>
+            </div>
+
+            <!-- End Date & Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                     <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Eind Datum</label>
+                     <input type="date" name="end_date" value="<?= date('Y-m-d', strtotime($lan['end_date'])) ?>" required
+                            class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
+                </div>
+                 <div>
+                    <label class="block text-[10px] text-cyber-cyan uppercase tracking-widest mb-2">Eind Tijd</label>
+                    <input type="time" name="end_time" value="<?= date('H:i', strtotime($lan['end_date'])) ?>" required
+                           class="w-full bg-black/40 border border-white/10 text-white px-4 py-3 focus:border-cyber-cyan focus:outline-none transition-all [color-scheme:dark]">
+                    <p class="text-[9px] text-white/30 mt-1">* Indien vroeger dan start, telt als volgende dag.</p>
                 </div>
             </div>
 

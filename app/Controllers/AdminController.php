@@ -112,8 +112,8 @@ class AdminController
             'description' => $_POST['description'],
             'attendees'   => (int)$_POST['attendees'],
             'email'       => $_POST['email'],
-            'start_date'  => $_POST['start_date'],
-            'end_date'    => $_POST['end_date']
+            'start_date'  => $_POST['start_date'] . ' ' . $_POST['start_time'] . ':00',
+            'end_date'    => $_POST['end_date'] . ' ' . $_POST['end_time'] . ':00'
         ];
 
         $this->lanRepo->update($id, $data);

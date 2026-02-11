@@ -54,8 +54,22 @@
                                 
                                 <!-- Meta Data -->
                                 <div class="flex space-x-6 text-[10px] uppercase tracking-wider text-white/40 font-mono">
-                                    <span class="flex items-center"><span class="mr-2 text-cyber-cyan">📅</span> <?= date('d M Y', strtotime($prop['start_date'])) ?></span>
-                                    <span class="flex items-center"><span class="mr-2 text-cyber-cyan">👥</span> Target: <?= $prop['expected_attendees'] ?> Units</span>
+                                    <span class="flex items-center">
+                                        <span class="mr-2 text-cyber-cyan">📅</span> 
+                                        <?php 
+                                            $start = strtotime($prop['start_date']);
+                                            $end   = strtotime($prop['end_date']);
+                                            
+                                            // Check of het op dezelfde dag eindigt
+                                            if (date('Y-m-d', $start) === date('Y-m-d', $end)) {
+                                                echo date('d M Y', $start) . ' <span class="text-cyber-gray mx-1">|</span> ' . date('H:i', $start) . ' - ' . date('H:i', $end);
+                                            } else {
+                                                // Meerdere dagen: Voeg ook tijden toe
+                                                echo date('d M H:i', $start) . ' - ' . date('d M Y H:i', $end);
+                                            }
+                                        ?>
+                                    </span>
+                                    <span class="flex items-center"><span class="mr-2 text-cyber-cyan">👥</span> Target: <?= $prop['expected_attendees'] ?> ATTENDEES</span>
                                 </div>
                             </div>
 

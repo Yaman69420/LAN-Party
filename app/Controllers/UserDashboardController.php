@@ -41,6 +41,7 @@ class UserDashboardController
                     $dateKey = $start->format('Y-m-d');
                     $parties[$dateKey] = [
                         'name'               => $p['name'],
+                        'time_string'        => date('H:i', strtotime($p['start_date'])) . ' - ' . date('H:i', strtotime($p['end_date'])),
                         'laptops'            => (int)$p['reserved_laptops'],
                         'attendees'          => (int)$p['expected_attendees']
                     ];
